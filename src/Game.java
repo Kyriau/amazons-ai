@@ -91,7 +91,7 @@ public class Game extends JFrame implements ActionListener {
         gr.fillRect(0, 0, 39, 39);
         gr.setColor(Color.YELLOW);
         gr.drawRect(0, 0, 39, 39);
-        gr.fillOval(15, 15, 9, 9);
+        //gr.fillOval(15, 15, 9, 9);
         ghost = new ImageIcon(img);
 
         EmptyBorder empty = new EmptyBorder(0, 0, 0, 0);
