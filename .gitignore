@@ -1,1 +1,7 @@
+# OSX metadata
 *.DS_Store
+
+# IntelliJ project data
+.idea/*
+*.iml
+out/*
