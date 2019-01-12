@@ -79,13 +79,10 @@ public class Game extends JFrame implements ActionListener {
 
         img = new BufferedImage(40, 40, BufferedImage.TYPE_INT_RGB);
         gr = img.getGraphics();
-        gr.setColor(Color.RED);
+        gr.setColor(Color.DARK_GRAY);
         gr.fillRect(0, 0, 39, 39);
         gr.setColor(Color.YELLOW);
         gr.drawRect(0, 0, 39, 39);
-        gr.setColor(Color.DARK_GRAY);
-        gr.drawLine(1, 1, 39, 39);
-        gr.drawLine(1, 39, 39, 1);
         block = new ImageIcon(img);
 
         img = new BufferedImage(40, 40, BufferedImage.TYPE_INT_RGB);
@@ -94,7 +91,7 @@ public class Game extends JFrame implements ActionListener {
         gr.fillRect(0, 0, 39, 39);
         gr.setColor(Color.YELLOW);
         gr.drawRect(0, 0, 39, 39);
-        gr.fillOval(15, 15, 23, 23);
+        gr.fillOval(15, 15, 9, 9);
         ghost = new ImageIcon(img);
 
         EmptyBorder empty = new EmptyBorder(0, 0, 0, 0);
