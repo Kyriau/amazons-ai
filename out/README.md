@@ -1,0 +1,1 @@
+This folder is intended only as a compiled class output folder. The .gitignore file will ignore all .class files in here.
