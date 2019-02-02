@@ -1,11 +1,13 @@
 package game;
 import java.util.Stack;
 
+/**
+ * This class allows diving and coming back up at a low cost, meant for fast, efficient traversal.
+ */
 public class BoardState {
 
     private Stack<Move> moveSequence;
     private Board board;
-    private BoardPieces playerTurn;
 
 
     /**
@@ -14,37 +16,25 @@ public class BoardState {
      * White's row index is lower than Black's
      */
     public BoardState(){
-        board = new Board(10, 10);
+        board = new Board(); // Default 10x10 board, white's move
         moveSequence = new Stack<Move>();
-
-        //White is first to move
-        playerTurn  = BoardPieces.WHITE;
-        // White's positioning
-        board.setPieceAt(3,0,BoardPieces.WHITE);
-        board.setPieceAt(0,3,BoardPieces.WHITE);
-        board.setPieceAt(0,6,BoardPieces.WHITE);
-        board.setPieceAt(3,9,BoardPieces.WHITE);
-        // Black's positioning
-        board.setPieceAt(6,0,BoardPieces.BLACK);
-        board.setPieceAt(9,3,BoardPieces.BLACK);
-        board.setPieceAt(9,6,BoardPieces.BLACK);
-        board.setPieceAt(6,9,BoardPieces.BLACK);
     }
 
     /**
-     * this function assumes the move is valid, it then applies the move to the board state, and pushes the move on to the stack
+     * Copies the current board, but has a move stack that is empty
+     * @param b The board who's state will be copied
+     */
+    public BoardState(Board b){
+        this.board = Board.copyBoard(b);
+        moveSequence = new Stack<Move>();
+    }
+
+    /**
+     * this function assumes the move is valid and is played from the correct players state
      * @param move A valid move from the current board state
      */
     public void playMove(Move move){
-        //Comment this check out for more speed
-        if(board.getPieceAt(move.startRow, move.startCol) != playerTurn){
-            throw new IllegalArgumentException("Trying to move a boards piece that is not the current players turn");
-        }
-
-        board.setPieceAt(move.startRow, move.startCol, BoardPieces.BLANK);
-        board.setPieceAt(move.endRow, move.endCol, playerTurn);
-        board.setPieceAt(move.arrowRow, move.arrowCol, BoardPieces.ARROW);
-        togglePlayerTurn();
+        board.playMove(move);
         moveSequence.push(move);
     }
 
@@ -55,26 +45,13 @@ public class BoardState {
     public boolean revertMove(){
         if(!moveSequence.isEmpty()) {
             Move move = moveSequence.pop();
-            togglePlayerTurn();
-            board.setPieceAt(move.arrowRow, move.arrowCol, BoardPieces.BLANK);
-            board.setPieceAt(move.endRow, move.endCol, BoardPieces.BLANK);
-            board.setPieceAt(move.startRow, move.startCol, playerTurn);
+            board.revertMove(move);
             return true;
         }else{
             return false;
         }
     }
 
-    /**
-     * Changes the board state from the current players turn to the other players turn
-     */
-    public void togglePlayerTurn(){
-        if(playerTurn == BoardPieces.WHITE){
-            playerTurn = BoardPieces.BLACK;
-        }else{
-            playerTurn = BoardPieces.WHITE;
-        }
-    }
 
     /**
      *
@@ -82,19 +59,6 @@ public class BoardState {
      * @return true if player turns are the same, board dimensions are the same, and all board elements are the same
      */
     public boolean equals(BoardState boardState) {
-        boolean areEqual = playerTurn == boardState.playerTurn;
-        areEqual = areEqual && board.numRows == boardState.board.numRows;
-        areEqual = areEqual && board.numCols == boardState.board.numCols;
-
-        if(!areEqual)
-            return false;
-
-        for(int i = 0; i < board.numRows; i++){
-            for(int j = 0; j < board.numCols; j++){
-                if(board.getPieceAt(i,j) != boardState.board.getPieceAt(i,j))
-                    return false;
-            }
-        }
-        return true;
+        return this.board.equals(boardState.board);
     }
 }
