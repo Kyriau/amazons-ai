@@ -1,12 +1,10 @@
 package strategies;
+
 import game.Board;
 import game.BoardPieces;
 import game.Move;
-import game.datastructures.MoveSequence;
 import heuristics.IBoardValue;
-
 import java.util.ArrayList;
-import java.util.Stack;
 
 /**
  * This class allows diving and coming back up at a low cost, meant for fast, efficient traversal.
@@ -24,8 +22,8 @@ public class CopylessAlphaBeta {
 
 
     /**
-     * Calling this function Will start the Alpha Beta search
-     * @return a move that guarantees the best possible score given the search depth
+     * Calling this function will start the Alpha Beta search
+     * @return a move that guarantees the best possible score given the search depth, if null, the game is over
      */
     public Move performSearch(){
         //Initialize
@@ -34,12 +32,12 @@ public class CopylessAlphaBeta {
         double alpha = Double.NEGATIVE_INFINITY;
         double beta = Double.POSITIVE_INFINITY;
         double result;
-        bestMove = null;
         int opponentTurn = BoardPieces.getColorCpposite(currentPlayersTurnColor);
 
         if(moves.isEmpty()){
             return null; //GAME OVER
         }
+        bestMove = moves.get(0);//Set equal to the first move arbitrarily
 
         //Continue while there are more moves to play
         for (Move a: moves) {
@@ -60,6 +58,16 @@ public class CopylessAlphaBeta {
      */
     protected double alphaBetaLayer(Move m, int depth, int playerTurn, double alpha, double beta){
         board.playMove(m);
+        ArrayList<Move> moves = board.getAllMoves(playerTurn);
+        //Check for game end
+        if(moves.isEmpty()){
+            if(depth%2 == 0){ // MAX LAYER
+                return Double.NEGATIVE_INFINITY;
+            }else{ // MIN LAYER
+                return Double.POSITIVE_INFINITY;
+            }
+        }
+
         if(depth == maxDepth){
             double value = boardValue.getBoardValueAsDouble(board);
             board.revertMove(m);
@@ -67,7 +75,6 @@ public class CopylessAlphaBeta {
         }
         double result;
 
-        ArrayList<Move> moves = board.getAllMoves(playerTurn);
         int nextDepth = depth +1;
         int opponentTurn = BoardPieces.getColorCpposite(playerTurn);
 
