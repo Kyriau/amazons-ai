@@ -1,5 +1,4 @@
 package strategies;
-import game.Move;
 import junit.framework.TestCase;
 import org.junit.*;
 

@@ -1,5 +1,8 @@
 package game;
 
+import game.datastructures.Board;
+import game.datastructures.BoardPieces;
+import game.datastructures.Move;
 import junit.framework.TestCase;
 import org.junit.*;
 

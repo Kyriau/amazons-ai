@@ -1,4 +1,4 @@
-package game;
+package game.datastructures;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package game;
+package game.datastructures;
 
 public enum NodeType {
     MIN,

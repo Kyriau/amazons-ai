@@ -1,7 +1,5 @@
 package game.datastructures;
 
-import game.Move;
-
 import java.util.ArrayList;
 
 

@@ -1,4 +1,4 @@
-package game;
+package game.datastructures;
 
 
 public class BoardPieces {
@@ -17,6 +17,10 @@ public class BoardPieces {
             default:
                 throw new IllegalArgumentException("illegal colour selection: color = " + pieceColor);
         }
+    }
+
+    public static boolean isPlayerColor(int playerColor){
+        return playerColor == WHITE || playerColor == BLACK;
     }
 
     public static String getPieceString(int piece){
