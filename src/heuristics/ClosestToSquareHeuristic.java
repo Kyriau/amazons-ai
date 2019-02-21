@@ -86,6 +86,7 @@ public class ClosestToSquareHeuristic implements IBoardValue{
                 for(Location candidate : validLocations){
                     if( distance < distances[candidate.row][candidate.col]){
                         distances[candidate.row][candidate.col] = distance;
+                        frontier.add(candidate);
                     }
                 }
 
