@@ -2,14 +2,40 @@ package heuristics;
 
 import game.datastructures.Board;
 import game.datastructures.BoardPieces;
-import game.datastructures.Move;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 public class ClosestToSquareHeuristic implements IBoardValue{
+
+
+    private final int[][] whiteDistances;//Will be used to hold the number of moves in the shortest path to a square, zero indicates no path
+    private final int[][] blackDistances;//Will be used to hold the number of moves in the shortest path to a square, zero indicates no path
+    private final boolean[][] searched;//For a given piece, this array will be used to ensure we do not re-search locations
+    private final Queue<Location> frontier;//This is a standard breadth first search queue
+
+    private final Location[] offsets = new Location[]{
+            new Location(-1, -1),
+            new Location(-1, 0),
+            new Location(-1, 1),
+            new Location(0, 1),
+            new Location(1, 1),
+            new Location(1, 0),
+            new Location(1, -1),
+            new Location(0, -1)
+    };
+
+    /**
+     *
+     * @param targetBoard This is just used to initialize the number of rows and columns expected, it is not held on to her altered
+     */
+    public ClosestToSquareHeuristic(Board targetBoard){
+        whiteDistances = new int[targetBoard.numRows][targetBoard.numCols];
+        blackDistances = new int[targetBoard.numRows][targetBoard.numCols];
+        searched = new boolean[targetBoard.numRows][targetBoard.numCols];
+        frontier = new ArrayDeque<Location>(100);
+    }
 
     @Override
     public int getBoardValueAsInt(Board b, int playerTurn) {
@@ -29,8 +55,8 @@ public class ClosestToSquareHeuristic implements IBoardValue{
         }
         int[][] whiteLocations = b.getPieceLocations(BoardPieces.WHITE);
         int[][] blackLocations = b.getPieceLocations(BoardPieces.BLACK);
-        int[][] whiteDistances = new int[b.numRows][b.numCols];
-        int[][] blackDistances = new int[b.numRows][b.numCols];
+        reinitializeToZero(whiteDistances);
+        reinitializeToZero(blackDistances);
 
 
         populateWithScores(b, whiteLocations, whiteDistances);
@@ -57,8 +83,7 @@ public class ClosestToSquareHeuristic implements IBoardValue{
             }else{
                 return Double.POSITIVE_INFINITY;
             }
-        }
-        if(whiteScore == 0 && blackScore > 0){
+        }else if(whiteScore == 0 && blackScore > 0){
             return Double.NEGATIVE_INFINITY;
         }else if(whiteScore > 0 && blackScore == 0){
             return Double.POSITIVE_INFINITY;
@@ -69,15 +94,16 @@ public class ClosestToSquareHeuristic implements IBoardValue{
     }
 
     private void populateWithScores( Board b, int[][] pieceLocations, int[][] distances){
-        Queue<Location> frontier;
-        Location loc;
+        //If too much GC, consider just emptying this List intsead of
         ArrayList<Location> validLocations;
-        boolean[][] searched;
 
 
+        //frontier is always empty at the start of this method because it runs until the frontier is empty
+        if(!frontier.isEmpty()){
+            throw new IllegalStateException("Frontier was expected to be empty.");
+        }
         for (int[] pieceLocation: pieceLocations) {
-            frontier = new ArrayDeque<Location>(25);
-            searched = new boolean[b.numRows][b.numCols]; // Searched for this piece before?
+            reinitializeToFalse(searched); // Searched for this piece before?
             searched[pieceLocation[0]][pieceLocation[1]] = true;
             frontier.add(new Location(pieceLocation[0], pieceLocation[1]));
             int distance = 1;
@@ -96,16 +122,29 @@ public class ClosestToSquareHeuristic implements IBoardValue{
 
     }
 
-    private final Location[] offsets = new Location[]{
-            new Location(-1, -1),
-            new Location(-1, 0),
-            new Location(-1, 1),
-            new Location(0, 1),
-            new Location(1, 1),
-            new Location(1, 0),
-            new Location(1, -1),
-            new Location(0, -1)
-    };
+    /**
+     * this method is intended to limit the number of times the Java must run its garbage collector by recycling memory
+     * @param array
+     */
+    private void reinitializeToZero(int[][] array){
+        for(int i = 0; i < array.length; i++){
+            for(int j = 0; j < array[0].length; j++){
+                array[i][j] = 0;
+            }
+        }
+    }
+
+    /**
+     * this method is intended to limit the number of times the Java must run its garbage collector by recycling memory
+     * @param array
+     */
+    private void reinitializeToFalse(boolean[][] array){
+        for(int i = 0; i < array.length; i++){
+            for(int j = 0; j < array[0].length; j++){
+                array[i][j] = false;
+            }
+        }
+    }
 
     /**
      * @param initialLocation The location to find all valid places to move a queen in one turn

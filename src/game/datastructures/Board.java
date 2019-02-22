@@ -29,6 +29,7 @@ public class Board {
         board[0][3] = BoardPieces.WHITE;
         board[0][6] = BoardPieces.WHITE;
         board[3][9] = BoardPieces.WHITE;
+
         // Black's positioning
         board[6][0] = BoardPieces.BLACK;
         board[9][3] = BoardPieces.BLACK;
