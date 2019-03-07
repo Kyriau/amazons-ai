@@ -1,4 +1,4 @@
-package game;
+package game.datastructures;
 
 public class Move{
 
@@ -16,5 +16,23 @@ public class Move{
         this.endCol = endCol;
         this.arrowRow = arrowRow;
         this.arrowCol = arrowCol;
+    }
+
+    public boolean equals(Move m){
+        return startRow == m.startRow
+                && startCol == m.startCol
+                && endRow == m.endRow
+                && endCol == m.endCol
+                && arrowRow == m.arrowRow
+                && arrowCol == m.arrowCol;
+    }
+
+    public String toString(){
+        StringBuilder s = new StringBuilder("(");
+        s.append("("+startRow + "," + startCol +")");
+        s.append("("+endRow + "," + endCol +")");
+        s.append("("+arrowRow + "," + arrowCol +")");
+        s.append(")");
+        return s.toString();
     }
 }
