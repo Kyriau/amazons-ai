@@ -1,5 +1,6 @@
 package client;
 
+import java.util.Map;
 import java.util.Scanner;
 
 import ygraphs.ai.smart_fox.games.GameClient;
@@ -52,7 +53,7 @@ public class TextClient extends Client {
         String password = sc.nextLine();
 
         // Removing the ClientPlayer and using the other constructor ends up throwing some NullPointerException
-        gaoClient = new GameClient(username, password, new ClientPlayer(username));
+        gaoClient = new GameClient(username, password, new ClientPlayer(username, this));
 
     }
 
@@ -84,6 +85,12 @@ public class TextClient extends Client {
         sb.append("\texit\t- Exit program.\n");
 
         return sb.toString();
+
+    }
+
+    public void handleGameMessage(String messageType, Map<String,Object> msgDetails) {
+
+        //TODO: Notify Agent.
 
     }
 

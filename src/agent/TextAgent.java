@@ -36,10 +36,10 @@ public class TextAgent extends Agent {
 
     }
 
-    public void receiveMove(int fromRow, int fromCol, int toRow, int toCol, int arrowRow, int arrowCol) {
+    public void receiveMove(Move move) {
 
         System.out.println("Opponent has made a move.");
-        System.out.println(fromRow + ", " + fromCol + ", " + toRow + ", " + toCol + ", " + arrowRow + ", " + arrowCol);
+        System.out.println(move.toString());
 
     }
 

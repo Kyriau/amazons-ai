@@ -4,7 +4,8 @@ import game.Move;
 
 /**
  * An agent that plays the Amazons game.
- * Any processing of data (minmax, heuristics) should be done in this objects run thread.
+ * Any processing of data (minmax, heuristics) should be done using this objects run method.
+ * A new Thread object should be created, with an Agent in it's constructor, and started.
  */
 public abstract class Agent implements Runnable {
 
