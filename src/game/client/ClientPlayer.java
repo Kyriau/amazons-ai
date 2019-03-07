@@ -24,7 +24,10 @@ public class ClientPlayer extends GamePlayer {
 
     public boolean handleGameMessage(String messageType, Map<String,Object> msgDetails) {
 
-        // Just pass data down to the client.
+        System.out.println("Message received.");
+        System.out.println(messageType);
+
+        // Pass data down to the client.
         client.handleGameMessage(messageType, msgDetails);
 
         // Assuming Gao expects that true means successfully handled.

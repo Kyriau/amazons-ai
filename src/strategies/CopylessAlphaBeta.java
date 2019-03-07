@@ -82,7 +82,7 @@ public class CopylessAlphaBeta {
         }
 
         if(depth == maxDepth){
-            double value = boardValue.getBoardValueAsDouble(board);
+            double value = boardValue.getBoardValueAsDouble(board, -1);
             board.revertMove(m);
             return value;
         }

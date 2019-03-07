@@ -42,7 +42,8 @@ public abstract class Client implements Runnable {
     public static void main(String[] args) {
 
         TextClient client = new TextClient();
-        client.run();
+        Thread main = new Thread(client);
+        main.start();
 
     }
 
