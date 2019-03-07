@@ -1,5 +1,6 @@
 # OSX metadata
 **/*.DS_Store
+**/META-INF/*
 
 # IntelliJ project data
 .idea/**

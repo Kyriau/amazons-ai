@@ -5,3 +5,5 @@ This will ensure that the configuration files for your IDE do not get pushed up 
 
 Next, pointer IDE to use junit 4.12.
 JDK v TBD
+
+To access Gao's dependencies, you will need to setup Maven. In IntelliJ, you just need to right click pom.xml in the project viewer, select "use as Maven", and then right click again and select "Maven>Reimport".
