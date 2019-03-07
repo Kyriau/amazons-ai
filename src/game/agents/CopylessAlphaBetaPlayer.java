@@ -1,4 +1,4 @@
-package game.Players;
+package game.agents;
 
 import game.datastructures.Board;
 import game.datastructures.BoardPieces;
@@ -11,7 +11,7 @@ import strategies.CopylessAlphaBeta;
 /**
  *
  */
-public class CopylessAlphaBetaPlayer implements IPlayer, Runnable{
+public class CopylessAlphaBetaPlayer extends Agent {
 
     private Move bestMove;
     private Board b;
@@ -59,7 +59,11 @@ public class CopylessAlphaBetaPlayer implements IPlayer, Runnable{
     }
 
     @Override
-    public Move getCurrentBestMove() {
+    public Move makeMove() {
         return bestMove;
+    }
+
+    public void receiveMove(Move move) {
+        //TODO: Update board, restart heuristic searches
     }
 }

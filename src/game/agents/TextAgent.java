@@ -1,6 +1,6 @@
-package agent;
+package game.agents;
 
-import game.Move;
+import game.datastructures.Move;
 
 import java.util.Scanner;
 

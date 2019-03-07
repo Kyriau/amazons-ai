@@ -1,6 +1,6 @@
-package client;
+package game.client;
 
-import agent.*;
+import game.agents.*;
 
 import java.util.Map;
 

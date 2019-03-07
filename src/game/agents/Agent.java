@@ -1,6 +1,6 @@
-package agent;
+package game.agents;
 
-import game.Move;
+import game.datastructures.Move;
 
 /**
  * An agent that plays the Amazons game.
