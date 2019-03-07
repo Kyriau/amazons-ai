@@ -21,6 +21,7 @@ public abstract class Client implements Runnable {
 
         // List one Agent per line, tabbed once.
         sb.append("\t" + TextAgent.class.getSimpleName() + "\n");
+        sb.append("\t" + CopylessAlphaBetaPlayer.class.getSimpleName() + "\n");
 
         return sb.toString();
 
@@ -30,6 +31,8 @@ public abstract class Client implements Runnable {
 
         if(input.equalsIgnoreCase(TextAgent.class.getSimpleName()))
             return TextAgent.class;
+        else if(input.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
+            return CopylessAlphaBetaPlayer.class;
         else
             throw new IllegalArgumentException("Unknown input Agent class");
 
