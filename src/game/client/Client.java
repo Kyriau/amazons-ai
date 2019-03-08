@@ -27,20 +27,25 @@ public abstract class Client implements Runnable {
 
     }
 
-    public static java.lang.Class parseAgent(String input) {
+    /**
+     * Get a subclass of Agent based on a String name.
+     * @param name The name of the subclass of Agent to try to find.
+     * @return The subclass of Agent found.
+     */
+    public static java.lang.Class parseAgent(String name) {
 
-        if(input.equalsIgnoreCase(TextAgent.class.getSimpleName()))
+        if(name.equalsIgnoreCase(TextAgent.class.getSimpleName()))
             return TextAgent.class;
-        else if(input.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
+        else if(name.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
             return CopylessAlphaBetaPlayer.class;
         else
-            throw new IllegalArgumentException("Unknown input Agent class");
+            throw new IllegalArgumentException("Unknown input Agent subclass.");
 
     }
 
     /**
      * Entry point for program.
-     * @param args
+     * @param args Arguments. Currently unused.
      */
     public static void main(String[] args) {
 

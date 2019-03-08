@@ -38,15 +38,15 @@ public class TextClient extends Client {
 
             input = sc.nextLine();
 
-            if(input.equals("login")) {
+            if(input.equalsIgnoreCase("login")) {
                 login();
-            } else if(input.equals("logout")) {
+            } else if(input.equalsIgnoreCase("logout")) {
                 logout();
-            } else if(input.equals("rooms")) {
+            } else if(input.equalsIgnoreCase("rooms")) {
                 rooms();
-            } else if(input.equals("join")) {
+            } else if(input.equalsIgnoreCase("join")) {
                 join();
-            } else if(!input.equals("exit")) {
+            } else if(!input.equalsIgnoreCase("exit")) {
                 System.out.println("Unrecognized Command.");
             }
 
