@@ -1,12 +1,15 @@
 package game.client;
 
 import game.agents.*;
+import game.datastructures.Move;
 
 import java.util.Map;
 
 public abstract class Client implements Runnable {
 
-    public abstract void handleGameMessage(String messageType, Map<String,Object> msgDetails);
+    public abstract void handleGameMessage(String messageType, Map<String, Object> msgDetails);
+
+    public abstract void sendMove(Move move);
 
     /**
      * Get a string that lists all currently available Agents.
@@ -22,6 +25,7 @@ public abstract class Client implements Runnable {
         // List one Agent per line, tabbed once.
         sb.append("\t" + TextAgent.class.getSimpleName() + "\n");
         sb.append("\t" + CopylessAlphaBetaPlayer.class.getSimpleName() + "\n");
+        sb.append("\t" + DumbAgent.class.getSimpleName() + "\n");
 
         return sb.toString();
 
@@ -38,6 +42,8 @@ public abstract class Client implements Runnable {
             return TextAgent.class;
         else if(name.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
             return CopylessAlphaBetaPlayer.class;
+        else if(name.equalsIgnoreCase(DumbAgent.class.getSimpleName()))
+            return DumbAgent.class;
         else
             throw new IllegalArgumentException("Unknown input Agent subclass.");
 

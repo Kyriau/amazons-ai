@@ -1,11 +1,15 @@
 package game.client;
 
 import game.agents.Agent;
+import game.agents.DumbAgent;
+import game.datastructures.Move;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
 
+import ygraphs.ai.smart_fox.GameMessage;
+import ygraphs.ai.smart_fox.games.AmazonsGameMessage;
 import ygraphs.ai.smart_fox.games.GameClient;
 import ygraphs.ai.smart_fox.games.GamePlayer;
 
@@ -17,6 +21,14 @@ public class TextClient extends Client {
     private GamePlayer gaoPlayer;
 
     private Agent agent;
+
+    private Thread delay;
+    private GameTimer timer;
+
+    private int turnOrder;
+    private int turnCount;
+
+    private Move nextMove;
 
     public TextClient() {
 
@@ -56,6 +68,24 @@ public class TextClient extends Client {
 
     }
 
+    private String getCommands() {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("List of Commands\n");
+        if(gaoClient == null)
+            sb.append("\tlogin\t- Connect to Gao's server.\n");
+        else {
+            sb.append("\tlogout\t- Disconnect from Gao's server.\n");
+            sb.append("\trooms\t- List the Amazons rooms available.\n");
+            sb.append("\tjoin\t- Join an Amazons room.\n");
+        }
+        sb.append("\texit\t- Exit program.\n");
+
+        return sb.toString();
+
+    }
+
     private void login() {
 
         logout();
@@ -69,6 +99,10 @@ public class TextClient extends Client {
         gaoPlayer = new ClientPlayer(username, this);
         gaoClient = new GameClient(username, password, gaoPlayer);
 
+        //TODO: dynamic agent choice
+        agent = new DumbAgent();
+        timer = new GameTimer(agent, this);
+
     }
 
     private void logout() {
@@ -79,7 +113,9 @@ public class TextClient extends Client {
         gaoClient = null;
         gaoPlayer = null;
 
-        // Gao's code has some funky stuff where logout won't close an IO thread
+        agent = null;
+
+        // Gao's code has some funky stuff where his gaoClient.logout() won't close an IO thread
         // This means that sometimes all our code may finish running, but the JVM won't close.
 
     }
@@ -119,28 +155,59 @@ public class TextClient extends Client {
 
     }
 
-    public String getCommands() {
+    public void handleGameMessage(String messageType, Map<String,Object> msgDetails) {
 
-        StringBuilder sb = new StringBuilder();
+        if(messageType.equals(GameMessage.GAME_ACTION_START)) {
 
-        sb.append("List of Commands\n");
-        if(gaoClient == null)
-            sb.append("\tlogin\t- Connect to Gao's server.\n");
-        else {
-            sb.append("\tlogout\t- Disconnect from Gao's server.\n");
-            sb.append("\trooms\t- List the Amazons rooms available.\n");
-            sb.append("\tjoin\t- Join an Amazons room.\n");
+            // White is "supposed" to play first, but Gao at some point said Black will go first
+            String blackName = (String) msgDetails.get(ClientPlayer.PLAYER_BLACK_STRING);
+            if(blackName.equals(gaoPlayer.userName())) {
+                turnOrder = 0;
+                startTimer();
+            } else {
+                turnOrder = 1;
+            }
+
+        } else if(messageType.equals(GameMessage.GAME_ACTION_MOVE)) {
+
+            ArrayList<Integer> from = (ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.QUEEN_POS_CURR);
+            ArrayList<Integer> to = (ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.Queen_POS_NEXT);
+            ArrayList<Integer> arrow = (ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.ARROW_POS);
+
+            Move move = new Move(
+                    from.get(0),
+                    from.get(1),
+                    to.get(0),
+                    to.get(1),
+                    arrow.get(0),
+                    arrow.get(1)
+            );
+
+            agent.receiveMove(move);
+
+            startTimer();
+
         }
-        sb.append("\texit\t- Exit program.\n");
-
-        return sb.toString();
 
     }
 
-    public void handleGameMessage(String messageType, Map<String,Object> msgDetails) {
+    private void startTimer() {
+        //delay.interrupt();
+        delay = new Thread(timer);
+        delay.start();
+    }
 
-        //TODO: Notify Agent.
-
+    /**
+     * Send a move to Gao's server.
+     * @param move The move to send.
+     */
+    public void sendMove(Move move) {
+        System.out.println("Sending Move: " + move.toString());
+        gaoClient.sendMoveMessage(
+                new int[] {move.startRow, move.startCol},
+                new int[] {move.endRow, move.endCol},
+                new int[] {move.arrowRow, move.arrowCol}
+        );
     }
 
 }
