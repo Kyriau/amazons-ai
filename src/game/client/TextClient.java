@@ -189,6 +189,9 @@ public class TextClient extends Client {
 
             window = new GameWindow();
 
+            Thread agentThread = new Thread(agent);
+            agentThread.start();
+
         } else if(messageType.equals(GameMessage.GAME_ACTION_MOVE)) {
 
             ArrayList<Integer> from = (ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.QUEEN_POS_CURR);
