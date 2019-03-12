@@ -25,10 +25,7 @@ public class TextClient extends Client {
     private Thread delay;
     private GameTimer timer;
 
-    private int turnOrder;
-    private int turnCount;
-
-    private Move nextMove;
+    private GameWindow window;
 
     public TextClient() {
 
@@ -50,19 +47,21 @@ public class TextClient extends Client {
 
             input = sc.nextLine();
 
-            if(input.equalsIgnoreCase("login")) {
+            if(input.startsWith("login")) {
                 login();
-            } else if(input.equalsIgnoreCase("logout")) {
+            } else if(input.startsWith("logout")) {
                 logout();
-            } else if(input.equalsIgnoreCase("rooms")) {
+            } else if(input.startsWith("rooms")) {
                 rooms();
-            } else if(input.equalsIgnoreCase("join")) {
+            } else if(input.startsWith("join")) {
                 join();
-            } else if(!input.equalsIgnoreCase("exit")) {
+            } else if(input.startsWith("agent")) {
+                agent();
+            } else if(!input.startsWith("exit")) {
                 System.out.println("Unrecognized Command.");
             }
 
-        } while(!input.equals("exit"));
+        } while(!input.startsWith("exit"));
 
         exit();
 
@@ -79,6 +78,7 @@ public class TextClient extends Client {
             sb.append("\tlogout\t- Disconnect from Gao's server.\n");
             sb.append("\trooms\t- List the Amazons rooms available.\n");
             sb.append("\tjoin\t- Join an Amazons room.\n");
+            sb.append("\tagent\t- Set the agent used to play.\n");
         }
         sb.append("\texit\t- Exit program.\n");
 
@@ -99,7 +99,6 @@ public class TextClient extends Client {
         gaoPlayer = new ClientPlayer(username, this);
         gaoClient = new GameClient(username, password, gaoPlayer);
 
-        //TODO: dynamic agent choice
         agent = new DumbAgent();
         timer = new GameTimer(agent, this);
 
@@ -147,6 +146,16 @@ public class TextClient extends Client {
 
     }
 
+    private void agent() {
+
+        System.out.println(Agent.getAgentList());
+
+        String line = sc.nextLine();
+
+        agent = Agent.parseAgent(line);
+
+    }
+
     private void exit() {
 
         logout();
@@ -159,14 +168,12 @@ public class TextClient extends Client {
 
         if(messageType.equals(GameMessage.GAME_ACTION_START)) {
 
-            // White is "supposed" to play first, but Gao at some point said Black will go first
+            // White is "supposed" to play first, but Gao has Black playing first
             String blackName = (String) msgDetails.get(ClientPlayer.PLAYER_BLACK_STRING);
-            if(blackName.equals(gaoPlayer.userName())) {
-                turnOrder = 0;
+            if(blackName.equals(gaoPlayer.userName()))
                 startTimer();
-            } else {
-                turnOrder = 1;
-            }
+
+            window = new GameWindow();
 
         } else if(messageType.equals(GameMessage.GAME_ACTION_MOVE)) {
 
@@ -184,6 +191,7 @@ public class TextClient extends Client {
             );
 
             agent.receiveMove(move);
+            window.playMove(move);
 
             startTimer();
 
@@ -208,6 +216,7 @@ public class TextClient extends Client {
                 new int[] {move.endRow, move.endCol},
                 new int[] {move.arrowRow, move.arrowCol}
         );
+        window.playMove(move);
     }
 
 }

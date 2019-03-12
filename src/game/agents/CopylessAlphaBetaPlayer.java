@@ -40,7 +40,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
     }
 
     /**
-     * nce this method is invoked it will continue searching for ever until it is killed from the outside
+     * Once this method is invoked it will continue searching for ever until it is killed from the outside
      */
     @Override
     public void run() {
@@ -64,6 +64,6 @@ public class CopylessAlphaBetaPlayer extends Agent {
     }
 
     public void receiveMove(Move move) {
-        //TODO: Update board, restart heuristic searches
+        //TODO: Update board, restart heuristic searches, etc.
     }
 }
