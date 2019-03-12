@@ -35,4 +35,12 @@ public class GameTimer implements Runnable {
 
     }
 
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    public void setAgent(Agent agent) {
+        this.agent = agent;
+    }
+
 }

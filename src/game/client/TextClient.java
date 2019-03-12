@@ -57,6 +57,8 @@ public class TextClient extends Client {
                 join();
             } else if(input.startsWith("agent")) {
                 agent();
+            } else if(input.startsWith("timer")) {
+                timer();
             } else if(!input.startsWith("exit")) {
                 System.out.println("Unrecognized Command.");
             }
@@ -79,6 +81,7 @@ public class TextClient extends Client {
             sb.append("\trooms\t- List the Amazons rooms available.\n");
             sb.append("\tjoin\t- Join an Amazons room.\n");
             sb.append("\tagent\t- Set the agent used to play.\n");
+            sb.append("\ttimer\t- Set the speed to play at.\n");
         }
         sb.append("\texit\t- Exit program.\n");
 
@@ -99,7 +102,10 @@ public class TextClient extends Client {
         gaoPlayer = new ClientPlayer(username, this);
         gaoClient = new GameClient(username, password, gaoPlayer);
 
+        // Default agent: makes random invalid moves.
         agent = new DumbAgent();
+
+        // Default timer: waits 25 seconds before making a move.
         timer = new GameTimer(agent, this);
 
     }
@@ -149,10 +155,18 @@ public class TextClient extends Client {
     private void agent() {
 
         System.out.println(Agent.getAgentList());
-
         String line = sc.nextLine();
 
         agent = Agent.parseAgent(line);
+
+        timer.setAgent(agent);
+
+    }
+
+    private void timer() {
+
+        System.out.print("Set timer length in milliseconds: ");
+        timer.setTime(sc.nextLong());
 
     }
 
