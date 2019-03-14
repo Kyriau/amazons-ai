@@ -25,12 +25,17 @@ public class TextAgent extends Agent {
 
         System.out.println("Make a move: [fromRow] [fromCol] [toRow] [toCol] [arrowRow] [arrowCol]");
 
-        int fromRow = sc.nextInt();
-        int fromCol = sc.nextInt();
-        int toRow = sc.nextInt();
-        int toCol = sc.nextInt();
-        int arrowRow = sc.nextInt();
-        int arrowCol = sc.nextInt();
+        String line = sc.nextLine();
+        String[] params = new String[6];
+
+        int fromRow = Integer.parseInt(params[0]);
+        int fromCol = Integer.parseInt(params[1]);
+        int toRow = Integer.parseInt(params[2]);
+        int toCol = Integer.parseInt(params[3]);
+        int arrowRow = Integer.parseInt(params[4]);
+        int arrowCol = Integer.parseInt(params[5]);
+
+        System.out.println("Returning Move");
 
         return new Move(fromRow, fromCol, toRow, toCol, arrowRow, arrowCol);
 
