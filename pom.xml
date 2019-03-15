@@ -48,7 +48,7 @@
     </developers>
 
     <build>
- 
+		<sourceDirectory>G:\School\COSC\COSC 322\amazons-ai\src</sourceDirectory>
     </build>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

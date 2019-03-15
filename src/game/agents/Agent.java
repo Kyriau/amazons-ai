@@ -15,15 +15,18 @@ public abstract class Agent implements Runnable {
      * This method could be called at any time, and must return a valid move.
      * @return The move that this Agent makes.
      */
-    public abstract Move makeMove();
+    public abstract Move getBestMove();
 
     /**
-     * Handle receiving a move from the other player.
-     * This method will be called whenever the Client receives an opponent's move from the server.
-     * This method could be called at any time.
+     * Method called to change the player's Boardstate
      * @param move The move that has been made by the other player.
      */
-    public abstract void receiveMove(Move move);
+    public abstract void updateBoard(Move move);
+
+    /**
+     * Tells the agent to begin searching for a good move
+     */
+    public abstract void startSearch();
 
     /**
      * Get a string that lists all currently available Agents.
@@ -38,7 +41,7 @@ public abstract class Agent implements Runnable {
 
         // List one Agent per line, tabbed once.
         //sb.append("\t" + TextAgent.class.getSimpleName() + "\n"); // Unused for now since it doesn't work
-        //sb.append("\t" + CopylessAlphaBetaPlayer.class.getSimpleName() + "\n"); // Still needs work; see parseAgent()
+        sb.append("\t" + CopylessAlphaBetaPlayer.class.getSimpleName() + "\n"); // Still needs work; see parseAgent()
         sb.append("\t" + DumbAgent.class.getSimpleName() + "\n");
         sb.deleteCharAt(sb.length() - 1);
 
@@ -61,8 +64,8 @@ public abstract class Agent implements Runnable {
             //return new TextAgent();
 
         //TODO: Instantiate CopylessAlphaBetaPlayer correctly
-        //if(name.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
-            //return new CopylessAlphaBetaPlayer();
+        if(name.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
+            return CopylessAlphaBetaPlayer.buildDefault("BLACK");//By gao's API, WHICH ALWAYS SELECTS BLACK to go first
 
         throw new IllegalArgumentException("Unknown Agent subclass.");
 

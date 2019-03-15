@@ -8,7 +8,8 @@ public class DumbAgent extends Agent {
 
     private Random rand = new Random();
 
-    public Move makeMove() {
+    @Override
+    public Move getBestMove() {
 
         return new Move(
                 rand.nextInt(10),
@@ -21,11 +22,18 @@ public class DumbAgent extends Agent {
 
     }
 
-    public void receiveMove(Move move) {
+    @Override
+    public void updateBoard(Move move) {
 
         System.out.println("Move received: " + move.toString());
 
     }
+
+    @Override
+    public void startSearch() {
+
+    }
+
 
     public void run() {
 

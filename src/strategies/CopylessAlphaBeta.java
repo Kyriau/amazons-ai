@@ -1,5 +1,6 @@
 package strategies;
 
+import game.agents.CopylessAlphaBetaPlayer;
 import game.datastructures.Board;
 import game.datastructures.BoardPieces;
 import game.datastructures.Move;
@@ -13,7 +14,7 @@ import java.util.Arrays;
  * This class allows diving and coming back up at a low cost, meant for fast, efficient traversal.
  * Employs basic AlphaBeta
  */
-public class CopylessAlphaBeta {
+public class CopylessAlphaBeta implements Runnable{
 
     private final Board originalBoard;
 
@@ -25,12 +26,19 @@ public class CopylessAlphaBeta {
     private Move bestMove;
     private boolean useMoveHeuristic; // If false, do not apply move heuristic
 
+    //Stuff for the agent to move
+    private boolean interrupted;
+    private CopylessAlphaBetaPlayer invokingPlayer;
+
 
     /**
      * Calling this function will start the Alpha Beta search
      * @return a move that guarantees the best possible score given the search depth, if null, the game is over
      */
     public Move performSearch(){
+        if(interrupted){
+            throw new IllegalStateException("Once an AlphaBeta Search object has been interrupted, it cannot be used again");
+        }
         //Initialize
         refreshDataStructures();
         ArrayList<Move> moves = board.getAllMoves(currentPlayersTurnColor);
@@ -54,6 +62,9 @@ public class CopylessAlphaBeta {
             if(alpha < result){
                 alpha = result;
                 bestMove = a;
+            }
+            if(interrupted){
+                break;
             }
         }
 
@@ -82,7 +93,7 @@ public class CopylessAlphaBeta {
         }
 
         if(depth == maxDepth){
-            double value = boardValue.getBoardValueAsDouble(board, -1);
+            double value = boardValue.getBoardValueAsDouble(board, playerTurn);
             board.revertMove(m);
             return value;
         }
@@ -93,6 +104,9 @@ public class CopylessAlphaBeta {
 
         if(depth%2 == 0){//MAX LAYER
             for (Move a: moves) {
+                if(interrupted){ //This code is intended to allow us to stop this with the thread
+                    return alpha;
+                }
                 result = alphaBetaLayer(a, nextDepth, opponentTurn, alpha, beta);
                 if(alpha < result){
                     alpha = result;
@@ -102,6 +116,9 @@ public class CopylessAlphaBeta {
             return alpha;
         }else{//MIN LAYER
             for (Move a: moves) {
+                if(interrupted){ //This code is intended to allow us to stop this with the thread
+                    return beta;
+                }
                 result = alphaBetaLayer(a, nextDepth, opponentTurn, alpha, beta);
                 if(beta > result){
                     beta = result;
@@ -124,7 +141,8 @@ public class CopylessAlphaBeta {
                              IMoveValueHeuristic moveValueHeuristic,
                              boolean useMoveHeuristic,
                              int maxDepth,
-                             int currentPlayersTurnColor){
+                             int currentPlayersTurnColor,
+                             CopylessAlphaBetaPlayer invokingPlayer){
 
         if(maxDepth < 1){
             throw new IllegalArgumentException("We should at least search one layer");
@@ -134,7 +152,11 @@ public class CopylessAlphaBeta {
         this.boardValue = boardValueHeuristic;
         this.moveValue = moveValueHeuristic;
         this.useMoveHeuristic = useMoveHeuristic;
-        originalBoard = b;
+        originalBoard = Board.copyBoard(b);
+
+        //Purely for multithreaded control
+        this.interrupted = false;
+        this.invokingPlayer = invokingPlayer;
     }
 
     public void setMaxDepth(int maxDepth){
@@ -153,6 +175,13 @@ public class CopylessAlphaBeta {
     }
 
     /**
+     * Tell the object to stop processing
+     */
+    public void interrupt(){
+        this.interrupted = true;
+    }
+
+    /**
      *
      * @param moves The moves to be ordered by the heuristic passed into the constructor
      * @return The moves in descending order as specified by the heuristic
@@ -168,6 +197,16 @@ public class CopylessAlphaBeta {
             moves.add(mvp.m);
         }
         return moves;
+    }
+
+    /**
+     * Runs iterative deepening DFS on the boards state passed in.
+     * Runs until interrupted. Once interrupted the thread will end and this object is intended to be discarded
+     */
+    @Override
+    public void run() {
+        Move bestMoveAtDepth = performSearch();
+        invokingPlayer.giveSearchResult(this, bestMoveAtDepth);
     }
 
     class MoveValuePair implements Comparable<MoveValuePair>{

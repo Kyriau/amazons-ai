@@ -2,6 +2,7 @@ package game.client;
 
 import game.agents.Agent;
 import game.agents.DumbAgent;
+import game.datastructures.Board;
 import game.datastructures.Move;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class TextClient extends Client {
     private GamePlayer gaoPlayer;
 
     private Agent agent;
+    private Board b; //The current state of the game
 
     private Thread delay;
     private GameTimer timer;
@@ -181,16 +183,18 @@ public class TextClient extends Client {
     public void handleGameMessage(String messageType, Map<String,Object> msgDetails) {
 
         if(messageType.equals(GameMessage.GAME_ACTION_START)) {
+            //Get Agent Running
+            Thread agentThread = new Thread(agent);
+            agentThread.start();
 
             // White is "supposed" to play first, but Gao has Black playing first
             String blackName = (String) msgDetails.get(ClientPlayer.PLAYER_BLACK_STRING);
-            if(blackName.equals(gaoPlayer.userName()))
+            if(blackName.equals(gaoPlayer.userName())) {
+                agent.startSearch();
                 startTimer();
+            }
 
             window = new GameWindow();
-
-            Thread agentThread = new Thread(agent);
-            agentThread.start();
 
         } else if(messageType.equals(GameMessage.GAME_ACTION_MOVE)) {
 
@@ -207,10 +211,11 @@ public class TextClient extends Client {
                     arrow.get(1)
             );
 
-            agent.receiveMove(move);
+            agent.updateBoard(move);
             window.playMove(move);
 
             startTimer();
+            agent.startSearch();
 
         }
 
@@ -234,6 +239,7 @@ public class TextClient extends Client {
                 new int[] {move.arrowRow, move.arrowCol}
         );
         window.playMove(move);
+        agent.updateBoard(move);
     }
 
 }

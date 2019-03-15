@@ -1,6 +1,7 @@
 package game.client;
 
 import game.agents.Agent;
+import game.datastructures.Move;
 
 public class GameTimer implements Runnable {
 
@@ -27,7 +28,7 @@ public class GameTimer implements Runnable {
             System.out.println("Waiting for " + time + " milliseconds.");
             Thread.sleep(time);
             System.out.println("Making Move");
-            client.sendMove(agent.makeMove());
+            client.sendMove(agent.getBestMove());
             System.out.println("Move Made");
         } catch(InterruptedException e) {
             e.printStackTrace();

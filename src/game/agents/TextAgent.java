@@ -21,7 +21,7 @@ public class TextAgent extends Agent {
 
     }
 
-    public Move makeMove() {
+    public Move getBestMove() {
 
         System.out.println("Make a move: [fromRow] [fromCol] [toRow] [toCol] [arrowRow] [arrowCol]");
 
@@ -41,11 +41,16 @@ public class TextAgent extends Agent {
 
     }
 
-    public void receiveMove(Move move) {
+    public void updateBoard(Move move) {
 
         System.out.println("Opponent has made a move.");
         System.out.println(move.toString());
 
+    }
+
+    @Override
+    public void startSearch() {
+        //Do nothing since a player is always searching
     }
 
 }
