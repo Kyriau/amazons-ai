@@ -55,8 +55,8 @@ public class ClosestToSquareHeuristic implements IBoardValue{
         }
         int[][] whiteLocations = b.getPieceLocations(BoardPieces.WHITE);
         int[][] blackLocations = b.getPieceLocations(BoardPieces.BLACK);
-        reinitializeToZero(whiteDistances);
-        reinitializeToZero(blackDistances);
+        reinitializeToMax(whiteDistances);
+        reinitializeToMax(blackDistances);
 
 
         populateWithScores(b, whiteLocations, whiteDistances);
@@ -126,10 +126,10 @@ public class ClosestToSquareHeuristic implements IBoardValue{
      * this method is intended to limit the number of times the Java must run its garbage collector by recycling memory
      * @param array
      */
-    private void reinitializeToZero(int[][] array){
+    private void reinitializeToMax(int[][] array){
         for(int i = 0; i < array.length; i++){
             for(int j = 0; j < array[0].length; j++){
-                array[i][j] = 0;
+                array[i][j] = Integer.MAX_VALUE;
             }
         }
     }
