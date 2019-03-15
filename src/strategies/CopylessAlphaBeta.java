@@ -16,6 +16,8 @@ import java.util.Arrays;
  */
 public class CopylessAlphaBeta implements Runnable{
 
+    private int globalMoveCount = 0;
+
     private final Board originalBoard;
 
     private Board board;
@@ -54,10 +56,11 @@ public class CopylessAlphaBeta implements Runnable{
         if(useMoveHeuristic) {
             moves = orderMovesByHeuristic(moves);
         }
-        bestMove = moves.get(0);//Set equal to the first move arbitrarily
-
+        bestMove = moves.get(0);//Set equal to the first move
+        System.out.println("Moves =  " + moves.size() + ", depth = " + 0);
         //Continue while there are more moves to play
         for (Move a: moves) {
+            System.out.println("Next toplevel move");
             result = alphaBetaLayer(a, 1, opponentTurn, alpha, beta);
             if(alpha < result){
                 alpha = result;
@@ -66,6 +69,7 @@ public class CopylessAlphaBeta implements Runnable{
             if(interrupted){
                 break;
             }
+            globalMoveCount+= 1;
         }
 
         return bestMove;
@@ -95,14 +99,19 @@ public class CopylessAlphaBeta implements Runnable{
         if(depth == maxDepth){
             double value = boardValue.getBoardValueAsDouble(board, playerTurn);
             board.revertMove(m);
+            //System.out.println("Depth limit hit");
             return value;
         }
+
+        //System.out.println("Moves =  " + moves.size() + ", depth = " + depth);
+        System.out.println(globalMoveCount);
         double result;
 
         int nextDepth = depth +1;
         int opponentTurn = BoardPieces.getColorCpposite(playerTurn);
 
         if(depth%2 == 0){//MAX LAYER
+            System.out.println("Depth even Layer");
             for (Move a: moves) {
                 if(interrupted){ //This code is intended to allow us to stop this with the thread
                     return alpha;
@@ -111,10 +120,12 @@ public class CopylessAlphaBeta implements Runnable{
                 if(alpha < result){
                     alpha = result;
                 }
+                globalMoveCount+= 1;
             }
             board.revertMove(m);
             return alpha;
         }else{//MIN LAYER
+           // System.out.println("Depth odd Layer");
             for (Move a: moves) {
                 if(interrupted){ //This code is intended to allow us to stop this with the thread
                     return beta;
@@ -123,7 +134,10 @@ public class CopylessAlphaBeta implements Runnable{
                 if(beta > result){
                     beta = result;
                 }
+               // System.out.println("i = " + i );
+                globalMoveCount+= 1;
             }
+            System.out.println("Exited odd layer");
             board.revertMove(m);
             return beta;
         }
@@ -206,7 +220,9 @@ public class CopylessAlphaBeta implements Runnable{
     @Override
     public void run() {
         Move bestMoveAtDepth = performSearch();
-        invokingPlayer.giveSearchResult(this, bestMoveAtDepth);
+        if(invokingPlayer!= null) {//Here for testing
+            invokingPlayer.giveSearchResult(this, bestMoveAtDepth);
+        }
     }
 
     class MoveValuePair implements Comparable<MoveValuePair>{
