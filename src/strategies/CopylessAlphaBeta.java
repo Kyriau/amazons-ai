@@ -4,6 +4,7 @@ import game.agents.CopylessAlphaBetaPlayer;
 import game.datastructures.Board;
 import game.datastructures.BoardPieces;
 import game.datastructures.Move;
+import heuristics.HeuristicUtilities;
 import heuristics.IBoardValue;
 import heuristics.IMoveValueHeuristic;
 
@@ -16,7 +17,7 @@ import java.util.Arrays;
  */
 public class CopylessAlphaBeta implements Runnable{
 
-    //private int globalMoveCount = 0;
+    private int globalMoveCount = 0;
 
     private final Board originalBoard;
 
@@ -25,6 +26,7 @@ public class CopylessAlphaBeta implements Runnable{
     private int currentPlayersTurnColor;
     private IBoardValue boardValue;
     private IMoveValueHeuristic moveValue;
+    private HeuristicUtilities heuristicUtils;
     private Move bestMove;
     private boolean useMoveHeuristic; // If false, do not apply move heuristic
 
@@ -32,6 +34,38 @@ public class CopylessAlphaBeta implements Runnable{
     private boolean interrupted;
     private boolean runExited;
     private CopylessAlphaBetaPlayer invokingPlayer;
+
+    /**
+     *
+     * @param b The initial board state
+     * @param boardValueHeuristic How to evaluate the value of a leaf node
+     * @param maxDepth The depth limit of the search
+     * @param currentPlayersTurnColor Whose turn it is to move in the Board's initial state
+     */
+    public CopylessAlphaBeta(Board b,
+                             IBoardValue boardValueHeuristic,
+                             IMoveValueHeuristic moveValueHeuristic,
+                             boolean useMoveHeuristic,
+                             int maxDepth,
+                             int currentPlayersTurnColor,
+                             CopylessAlphaBetaPlayer invokingPlayer){
+
+        if(maxDepth < 1){
+            throw new IllegalArgumentException("We should at least search one layer");
+        }
+        this.maxDepth = maxDepth;
+        this.currentPlayersTurnColor = currentPlayersTurnColor;
+        this.boardValue = boardValueHeuristic;
+        this.moveValue = moveValueHeuristic;
+        this.useMoveHeuristic = useMoveHeuristic;
+        originalBoard = Board.copyBoard(b);
+        this.heuristicUtils = new HeuristicUtilities();
+
+        //Purely for multithreaded control
+        this.interrupted = false;
+        this.runExited= false;
+        this.invokingPlayer = invokingPlayer;
+    }
 
 
     /**
@@ -60,17 +94,18 @@ public class CopylessAlphaBeta implements Runnable{
         bestMove = moves.get(0);//Set equal to the first move
         //System.out.println("Moves =  " + moves.size() + ", depth = " + 0);
         //Continue while there are more moves to play
-        for (Move a: moves) {
+        for (Move m: moves) {
             //System.out.println("Next toplevel move");
-            result = alphaBetaLayer(a, 1, opponentTurn, alpha, beta);
+            result = alphaBetaLayer(m, 1, opponentTurn, alpha, beta);
             if(alpha < result){
                 alpha = result;
-                bestMove = a;
+                bestMove = m;
             }
             if(interrupted){
                 break;
             }
-           // globalMoveCount+= 1;
+           globalMoveCount+= 1;
+            System.out.println(globalMoveCount);
         }
 
         return bestMove;
@@ -115,6 +150,7 @@ public class CopylessAlphaBeta implements Runnable{
             //System.out.println("Depth even Layer");
             for (Move a: moves) {
                 if(interrupted){ //This code is intended to allow us to stop this with the thread
+                    board.revertMove(m);
                     return alpha;
                 }
                 result = alphaBetaLayer(a, nextDepth, opponentTurn, alpha, beta);
@@ -125,7 +161,7 @@ public class CopylessAlphaBeta implements Runnable{
                 if(alpha < result){
                     alpha = result;
                 }
-               // globalMoveCount+= 1;
+               globalMoveCount+= 1;
             }
             board.revertMove(m);
             return alpha;
@@ -133,6 +169,7 @@ public class CopylessAlphaBeta implements Runnable{
            // System.out.println("Depth odd Layer");
             for (Move a: moves) {
                 if(interrupted){ //This code is intended to allow us to stop this with the thread
+                    board.revertMove(m);
                     return beta;
                 }
                 result = alphaBetaLayer(a, nextDepth, opponentTurn, alpha, beta);
@@ -144,7 +181,7 @@ public class CopylessAlphaBeta implements Runnable{
                     beta = result;
                 }
                // System.out.println("i = " + i );
-                //globalMoveCount+= 1;
+                globalMoveCount+= 1;
             }
             //System.out.println("Exited odd layer");
             board.revertMove(m);
@@ -154,34 +191,119 @@ public class CopylessAlphaBeta implements Runnable{
 
     /**
      *
-     * @param b The initial board state
-     * @param boardValueHeuristic How to evaluate the value of a leaf node
-     * @param maxDepth The depth limit of the search
-     * @param currentPlayersTurnColor Whose turn it is to move in the Board's initial state
+     * @return
      */
-    public CopylessAlphaBeta(Board b,
-                             IBoardValue boardValueHeuristic,
-                             IMoveValueHeuristic moveValueHeuristic,
-                             boolean useMoveHeuristic,
-                             int maxDepth,
-                             int currentPlayersTurnColor,
-                             CopylessAlphaBetaPlayer invokingPlayer){
-
-        if(maxDepth < 1){
-            throw new IllegalArgumentException("We should at least search one layer");
+    public Move multiMethodAlphaBetaSearch(){
+        if(runExited){
+            throw new IllegalStateException("Once an AlphaBeta Search object has been interrupted, it cannot be used again");
         }
-        this.maxDepth = maxDepth;
-        this.currentPlayersTurnColor = currentPlayersTurnColor;
-        this.boardValue = boardValueHeuristic;
-        this.moveValue = moveValueHeuristic;
-        this.useMoveHeuristic = useMoveHeuristic;
-        originalBoard = Board.copyBoard(b);
+        //Initialize : Makes a board copy
+        refreshDataStructures();
+        ArrayList<Move> moves = board.getAllMoves(currentPlayersTurnColor);
+        if(moves.isEmpty()){
+            return null; //GAME OVER
+        }
+        if(useMoveHeuristic){
+            moves = heuristicUtils.orderMovesMethod(moves, board, moveValue);
+        }
 
-        //Purely for multithreaded control
-        this.interrupted = false;
-        this.runExited= false;
-        this.invokingPlayer = invokingPlayer;
+        double alpha = Double.NEGATIVE_INFINITY;
+        double beta = Double.POSITIVE_INFINITY;
+        double result;
+
+        bestMove = moves.get(0);//Set equal to the first move
+        //System.out.println("Moves =  " + moves.size() + ", depth = " + 0);
+        //Continue while there are more moves to play
+        for (Move m: moves) {
+            //System.out.println("Next toplevel move");
+            globalMoveCount +=1;
+            board.playMove(m);
+            result = minLayer(1, alpha, beta);
+            board.revertMove(m);
+            //System.out.println(globalMoveCount);
+            if(alpha < result){
+                alpha = result;
+                bestMove = m;
+            }
+            if(result >= beta){
+                return m;
+            }
+
+            if(interrupted){
+                break;
+            }
+            // globalMoveCount+= 1;
+        }
+
+        return bestMove;
     }
+
+    protected double maxLayer(int depth, double alpha, double beta){
+        //Terminal State Checking
+        if(depth == maxDepth){
+            return boardValue.getBoardValueAsDouble(board, currentPlayersTurnColor);
+        }
+        ArrayList<Move> moves = board.getAllMoves(currentPlayersTurnColor);
+        if(moves.isEmpty()){
+            return Double.NEGATIVE_INFINITY;//Max player cannot move, so utility of -infinity
+        }
+        if(useMoveHeuristic){
+            moves = heuristicUtils.orderMovesMethod(moves, board, moveValue);
+        }
+
+        //search deeper
+        int nextDepth = depth + 1;
+        double result = Double.NEGATIVE_INFINITY;
+        for(Move m : moves){
+            if(interrupted){
+                return result;
+            }
+            //globalMoveCount +=1;
+            board.playMove(m);
+            result = Math.max(result,minLayer(nextDepth, alpha,beta));
+            board.revertMove(m);
+
+            if(result >= beta){
+                return result;
+            }
+            alpha = Math.max(alpha, result);
+        }
+        return result;
+    }
+
+    protected double minLayer(int depth, double alpha, double beta){
+        //Terminal State Checking
+        if(depth == maxDepth){
+            //We still use the same utility regardless of who is calling it for this version since we always look from our players perspective
+            return boardValue.getBoardValueAsDouble(board, currentPlayersTurnColor);
+        }
+        ArrayList<Move> moves = board.getAllMoves(BoardPieces.getColorCpposite(currentPlayersTurnColor));
+        if(moves.isEmpty()){
+            return Double.POSITIVE_INFINITY;//Min player cannot move, so utility of -infinity
+        }
+        if(useMoveHeuristic){
+            moves = heuristicUtils.orderMovesMethod(moves, board, moveValue);
+        }
+
+        //search deeper
+        int nextDepth = depth + 1;
+        double result = Double.POSITIVE_INFINITY;
+        for(Move m : moves){
+            if(interrupted){
+                return result;
+            }
+            //globalMoveCount +=1;
+            board.playMove(m);
+            result = Math.min(result, maxLayer(nextDepth, alpha,beta));
+            board.revertMove(m);
+            if(result <= alpha){
+                return result;
+            }
+            beta = Math.min(beta, result);
+        }
+        return result;
+    }
+
 
     public void setMaxDepth(int maxDepth){
         if(maxDepth < 1){
@@ -229,7 +351,8 @@ public class CopylessAlphaBeta implements Runnable{
      */
     @Override
     public void run() {
-        Move bestMoveAtDepth = performSearch();
+        //Move bestMoveAtDepth = performSearch();
+        Move bestMoveAtDepth = multiMethodAlphaBetaSearch();
         if(invokingPlayer!= null) {//Here for testing
             invokingPlayer.giveSearchResult(this, bestMoveAtDepth);
         }

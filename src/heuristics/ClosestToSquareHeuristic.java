@@ -75,27 +75,43 @@ public class ClosestToSquareHeuristic implements IBoardValue{
         //Calculate scores, no one gets a score for an unreached or contested location
         for(int i = 0; i < b.numRows; i++){
             for(int j = 0; j < b.numCols; j++){
-                if(whiteDistances[i][j] > blackDistances[i][j]){
+                if(whiteDistances[i][j] < blackDistances[i][j]){
                     whiteScore += 1;
-                }else if(whiteDistances[i][j] < blackDistances[i][j]){
+                }else if(whiteDistances[i][j] > blackDistances[i][j]){
                     blackScore += 1;
                 }
             }
         }
-
-        //If no moves for anyone then the person whose turn it is will lose
-        if(whiteScore == 0 && blackScore == 0){
-            if(playerTurn == BoardPieces.WHITE){
+        //System.out.println("Player turn = " + playerTurn + ", whiteScore = " + whiteScore + ", blackScore = " + blackScore);
+        //Convert Score to ratio
+        if(playerTurn == BoardPieces.WHITE){
+            if(whiteScore == 0 && blackScore == 0){
+                //System.out.println("Exit: White 1");
+                    return 1;
+            }else if(whiteScore == 0 && blackScore > 0){
+                //System.out.println("Exit: White 2");
+                return Double.NEGATIVE_INFINITY;
+            }else if(whiteScore > 0 && blackScore == 0){
+                //System.out.println("Exit: White 3");
+                return Double.POSITIVE_INFINITY;
+            }else{
+                //System.out.println("Exit: White 4");
+                return ((double)whiteScore/blackScore);
+            }
+        }else{//Else PlayerTurn == black
+            if(whiteScore == 0 && blackScore == 0){
+                //System.out.println("Exit: Black 1");
+                return 1;
+            }else if(whiteScore == 0 && blackScore > 0){
+                //System.out.println("Exit: Black 2");
+                return Double.POSITIVE_INFINITY;
+            }else if(whiteScore > 0 && blackScore == 0){
+                //System.out.println("Exit: Black 3");
                 return Double.NEGATIVE_INFINITY;
             }else{
-                return Double.POSITIVE_INFINITY;
+                //System.out.println("Exit: Black 4");
+                return ((double)blackScore/whiteScore);
             }
-        }else if(whiteScore == 0 && blackScore > 0){
-            return Double.NEGATIVE_INFINITY;
-        }else if(whiteScore > 0 && blackScore == 0){
-            return Double.POSITIVE_INFINITY;
-        }else{
-            return ((double)whiteScore/blackScore);
         }
 
     }

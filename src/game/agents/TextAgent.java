@@ -53,4 +53,9 @@ public class TextAgent extends Agent {
         //Do nothing since a player is always searching
     }
 
+    @Override
+    public void setAgentColor(int color) {
+        //Do nothing, player knows what color they are
+    }
+
 }

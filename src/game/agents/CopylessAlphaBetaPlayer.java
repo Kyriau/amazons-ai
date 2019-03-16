@@ -3,10 +3,7 @@ package game.agents;
 import game.datastructures.Board;
 import game.datastructures.BoardPieces;
 import game.datastructures.Move;
-import heuristics.ClosestToSquareHeuristic;
-import heuristics.EqualityMoveHeuristic;
-import heuristics.IBoardValue;
-import heuristics.IMoveValueHeuristic;
+import heuristics.*;
 import strategies.CopylessAlphaBeta;
 
 
@@ -33,7 +30,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
         if(boardValue == null) {
             throw new IllegalArgumentException("Must have some way of evaluating the board");
         }
-        if(moveValue == null && useMoveHeuristic == false){
+        if(moveValue == null && useMoveHeuristic == true){
             throw new IllegalArgumentException("No move heuristic is specified, but you desire to use a move heuristic");
         }
         this.b = Board.copyBoard(b);
@@ -62,13 +59,14 @@ public class CopylessAlphaBetaPlayer extends Agent {
     @Override
     public void updateBoard(Move move) {
         //Stop the current search
-        System.out.println("updateBoard: Enter");
+        //System.out.println("updateBoard: Enter");
+        System.out.println("Agent "+ this + " Color = " + playerColor);
         if(currentMoveSearch != null) {
             currentMoveSearch.interrupt();
         }
 
         b.playMove(move);
-        playerColor = BoardPieces.getColorCpposite(playerColor);
+        //playerColor = BoardPieces.getColorCpposite(playerColor);
         depth = 1;
     }
 
@@ -78,6 +76,14 @@ public class CopylessAlphaBetaPlayer extends Agent {
         searchAtDepth();
     }
 
+    @Override
+    public void setAgentColor(int color) {
+        if(playerColor != BoardPieces.BLACK && playerColor != BoardPieces.WHITE){
+            throw new IllegalArgumentException("No such player colour");
+        }
+        this.playerColor = color;
+    }
+
 
     /**
      *
@@ -85,11 +91,16 @@ public class CopylessAlphaBetaPlayer extends Agent {
      * @param bestMove The best move by threadSearcher
      */
     public void giveSearchResult(CopylessAlphaBeta threadSearcher, Move bestMove){
-        System.out.println("giveSearchResult: Enter");
+        //System.out.println("giveSearchResult: Enter");
         if(threadSearcher == currentMoveSearch){//Check it is the same object
             System.out.println("Completed Search at Depth: " + depth);
             this.bestMove = bestMove;
-            searchNextDepth();
+            if(bestMove == null){
+                return;//No moves left in search. We lost
+            }
+            if(depth < 30) {
+                searchNextDepth();
+            }
         }
     }
 
@@ -97,7 +108,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
      * A function that acts as the recursion point for
      */
     private void searchNextDepth(){
-        System.out.println("SearchNextDepth: Enter");
+        //System.out.println("SearchNextDepth: Enter");
         depth += 1;
         searchAtDepth();
     }
@@ -112,9 +123,10 @@ public class CopylessAlphaBetaPlayer extends Agent {
         }
 
         //Begin new search at depth
+        //It is necessairy to copy boardValue or else there are access conflicts between threads
         currentMoveSearch = new CopylessAlphaBeta(b, boardValue.copy(), moveValue, useMoveHeuristic, depth, playerColor, this);
         Thread searchThread = new Thread(currentMoveSearch);
-        System.out.println("SearchAtDepth: Starting New Thread");
+        //System.out.println("SearchAtDepth: Starting New Thread");
         searchThread.start();
     }
 
@@ -127,14 +139,14 @@ public class CopylessAlphaBetaPlayer extends Agent {
         if(colorOfFirstToMove.equalsIgnoreCase("WHITE")){
             return new CopylessAlphaBetaPlayer(new Board(),
                     BoardPieces.WHITE,
-                    new EqualityMoveHeuristic(),
-                    false,
+                    new MobilityOrderingHeuristic(),
+                    true,
                     new ClosestToSquareHeuristic(new Board()));
         }else if(colorOfFirstToMove.equalsIgnoreCase("BLACK")){
             return new CopylessAlphaBetaPlayer(new Board(),
                     BoardPieces.BLACK,
-                    new EqualityMoveHeuristic(),
-                    false,
+                    new MobilityOrderingHeuristic(),
+                    true,
                     new ClosestToSquareHeuristic(new Board()));
         }else{
             throw new IllegalArgumentException("No Such Color");

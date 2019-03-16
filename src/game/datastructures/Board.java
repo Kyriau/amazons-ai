@@ -98,6 +98,10 @@ public class Board {
 
     }
 
+    public boolean isEmptyAt(int row, int col){
+        return board[row][col] == BoardPieces.EMPTY;
+    }
+
     /**
      *
      * @param playerTurn The player whose valid move set from this state we want to know

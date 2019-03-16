@@ -1,5 +1,6 @@
 package game.agents;
 
+import game.datastructures.BoardPieces;
 import game.datastructures.Move;
 
 /**
@@ -27,6 +28,8 @@ public abstract class Agent implements Runnable {
      * Tells the agent to begin searching for a good move
      */
     public abstract void startSearch();
+
+    public abstract void setAgentColor(int color);
 
     /**
      * Get a string that lists all currently available Agents.
@@ -65,7 +68,7 @@ public abstract class Agent implements Runnable {
 
         //TODO: Instantiate CopylessAlphaBetaPlayer correctly
         if(name.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
-            return CopylessAlphaBetaPlayer.buildDefault("BLACK");//By gao's API, WHICH ALWAYS SELECTS BLACK to go first
+            return CopylessAlphaBetaPlayer.buildDefault("WHITE");//By gao's API, WHICH ALWAYS SELECTS BLACK to go first, which we can correct for at game start
 
         throw new IllegalArgumentException("Unknown Agent subclass.");
 
