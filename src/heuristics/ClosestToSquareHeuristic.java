@@ -37,6 +37,13 @@ public class ClosestToSquareHeuristic implements IBoardValue{
         frontier = new ArrayDeque<Location>(100);
     }
 
+    private ClosestToSquareHeuristic(int numRow, int numCol){
+        whiteDistances = new int[numRow][numCol];
+        blackDistances = new int[numRow][numCol];
+        searched = new boolean[numRow][numCol];
+        frontier = new ArrayDeque<Location>(100);
+    }
+
     @Override
     public int getBoardValueAsInt(Board b, int playerTurn) {
         return (int) java.lang.Math.round(getBoardValueAsDouble(b, playerTurn));
@@ -55,8 +62,8 @@ public class ClosestToSquareHeuristic implements IBoardValue{
         }
         int[][] whiteLocations = b.getPieceLocations(BoardPieces.WHITE);
         int[][] blackLocations = b.getPieceLocations(BoardPieces.BLACK);
-        reinitializeToZero(whiteDistances);
-        reinitializeToZero(blackDistances);
+        reinitializeToMax(whiteDistances);
+        reinitializeToMax(blackDistances);
 
 
         populateWithScores(b, whiteLocations, whiteDistances);
@@ -68,29 +75,50 @@ public class ClosestToSquareHeuristic implements IBoardValue{
         //Calculate scores, no one gets a score for an unreached or contested location
         for(int i = 0; i < b.numRows; i++){
             for(int j = 0; j < b.numCols; j++){
-                if(whiteDistances[i][j] > blackDistances[i][j]){
+                if(whiteDistances[i][j] < blackDistances[i][j]){
                     whiteScore += 1;
-                }else if(whiteDistances[i][j] < blackDistances[i][j]){
+                }else if(whiteDistances[i][j] > blackDistances[i][j]){
                     blackScore += 1;
                 }
             }
         }
-
-        //If no moves for anyone then the person whose turn it is will lose
-        if(whiteScore == 0 && blackScore == 0){
-            if(playerTurn == BoardPieces.WHITE){
+        //System.out.println("Player turn = " + playerTurn + ", whiteScore = " + whiteScore + ", blackScore = " + blackScore);
+        //Convert Score to ratio
+        if(playerTurn == BoardPieces.WHITE){
+            if(whiteScore == 0 && blackScore == 0){
+                //System.out.println("Exit: White 1");
+                    return 1;
+            }else if(whiteScore == 0 && blackScore > 0){
+                //System.out.println("Exit: White 2");
+                return Double.NEGATIVE_INFINITY;
+            }else if(whiteScore > 0 && blackScore == 0){
+                //System.out.println("Exit: White 3");
+                return Double.POSITIVE_INFINITY;
+            }else{
+                //System.out.println("Exit: White 4");
+                return ((double)whiteScore/blackScore);
+            }
+        }else{//Else PlayerTurn == black
+            if(whiteScore == 0 && blackScore == 0){
+                //System.out.println("Exit: Black 1");
+                return 1;
+            }else if(whiteScore == 0 && blackScore > 0){
+                //System.out.println("Exit: Black 2");
+                return Double.POSITIVE_INFINITY;
+            }else if(whiteScore > 0 && blackScore == 0){
+                //System.out.println("Exit: Black 3");
                 return Double.NEGATIVE_INFINITY;
             }else{
-                return Double.POSITIVE_INFINITY;
+                //System.out.println("Exit: Black 4");
+                return ((double)blackScore/whiteScore);
             }
-        }else if(whiteScore == 0 && blackScore > 0){
-            return Double.NEGATIVE_INFINITY;
-        }else if(whiteScore > 0 && blackScore == 0){
-            return Double.POSITIVE_INFINITY;
-        }else{
-            return ((double)whiteScore/blackScore);
         }
 
+    }
+
+    @Override
+    public ClosestToSquareHeuristic copy() {
+        return new ClosestToSquareHeuristic(whiteDistances.length, whiteDistances[0].length);
     }
 
     private void populateWithScores( Board b, int[][] pieceLocations, int[][] distances){
@@ -126,10 +154,10 @@ public class ClosestToSquareHeuristic implements IBoardValue{
      * this method is intended to limit the number of times the Java must run its garbage collector by recycling memory
      * @param array
      */
-    private void reinitializeToZero(int[][] array){
+    private void reinitializeToMax(int[][] array){
         for(int i = 0; i < array.length; i++){
             for(int j = 0; j < array[0].length; j++){
-                array[i][j] = 0;
+                array[i][j] = Integer.MAX_VALUE;
             }
         }
     }

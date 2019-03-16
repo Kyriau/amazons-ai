@@ -1,7 +1,10 @@
 package game.client;
 
 import game.agents.Agent;
+import game.agents.CopylessAlphaBetaPlayer;
 import game.agents.DumbAgent;
+import game.datastructures.Board;
+import game.datastructures.BoardPieces;
 import game.datastructures.Move;
 
 import java.util.ArrayList;
@@ -21,6 +24,7 @@ public class TextClient extends Client {
     private GamePlayer gaoPlayer;
 
     private Agent agent;
+    private Board b; //The current state of the game
 
     private Thread delay;
     private GameTimer timer;
@@ -102,8 +106,8 @@ public class TextClient extends Client {
         gaoPlayer = new ClientPlayer(username, this);
         gaoClient = new GameClient(username, password, gaoPlayer);
 
-        // Default agent: makes random invalid moves.
-        agent = new DumbAgent();
+        // Default agent: alpha-beta player for the white side, if assigned black later, it is handled
+        agent =  CopylessAlphaBetaPlayer.buildDefault("WHITE");
 
         // Default timer: waits 25 seconds before making a move.
         timer = new GameTimer(agent, this);
@@ -181,16 +185,22 @@ public class TextClient extends Client {
     public void handleGameMessage(String messageType, Map<String,Object> msgDetails) {
 
         if(messageType.equals(GameMessage.GAME_ACTION_START)) {
-
-            // White is "supposed" to play first, but Gao has Black playing first
+            // White is "supposed" to play first, but Gao has Black playing first, we assume white agent until startup
             String blackName = (String) msgDetails.get(ClientPlayer.PLAYER_BLACK_STRING);
-            if(blackName.equals(gaoPlayer.userName()))
+            if(blackName.equals(gaoPlayer.userName())) {
+                agent.setAgentColor(BoardPieces.BLACK);
+                //Get Agent Running
+                Thread agentThread = new Thread(agent);
+                agentThread.start();
+                agent.startSearch();
                 startTimer();
+            }else{
+                //Get Agent Running
+                Thread agentThread = new Thread(agent);
+                agentThread.start();
+            }
 
             window = new GameWindow();
-
-            Thread agentThread = new Thread(agent);
-            agentThread.start();
 
         } else if(messageType.equals(GameMessage.GAME_ACTION_MOVE)) {
 
@@ -207,10 +217,11 @@ public class TextClient extends Client {
                     arrow.get(1)
             );
 
-            agent.receiveMove(move);
+            agent.updateBoard(move);
             window.playMove(move);
 
             startTimer();
+            agent.startSearch();
 
         }
 
@@ -234,6 +245,7 @@ public class TextClient extends Client {
                 new int[] {move.arrowRow, move.arrowCol}
         );
         window.playMove(move);
+        agent.updateBoard(move);
     }
 
 }
