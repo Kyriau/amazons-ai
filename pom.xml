@@ -60,7 +60,7 @@
     </developers>
 
     <build>
-		<sourceDirectory>G:\School\COSC\COSC 322\amazons-ai\src</sourceDirectory>
+		<sourceDirectory>${basedir}\src</sourceDirectory>
         <testSourceDirectory>${basedir}\test</testSourceDirectory>
     </build>
     <properties>
