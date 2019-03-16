@@ -110,6 +110,7 @@ public class Board {
         ArrayList<Move> moves = new ArrayList<>(100);
         int[][] piecePositions = getPieceLocations(playerTurn);
         for(int i = 0; i < piecePositions.length; i++){
+           // System.out.println("(row = " + piecePositions[i][0] + ", col = " + piecePositions[i][1] +")");
             moves.addAll(getMovesForPiece(piecePositions[i][0], piecePositions[i][1]));
         }
         return moves;
@@ -123,7 +124,8 @@ public class Board {
      */
     public ArrayList<Move> getMovesForPiece(int row, int col){
         if(board[row][col] != BoardPieces.BLACK && board[row][col] != BoardPieces.WHITE){
-            throw new IllegalArgumentException("Location does not contain a movable piece");
+            //System.out.println(this);
+            throw new IllegalArgumentException("Location does not contain a movable piece: (row = " + row + ", col = " + col +")");
         }
         ArrayList<Move> moves = new ArrayList<>(100);
         //For every direction we can move a queen

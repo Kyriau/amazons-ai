@@ -112,7 +112,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
         }
 
         //Begin new search at depth
-        currentMoveSearch = new CopylessAlphaBeta(b, boardValue, moveValue, useMoveHeuristic, depth, playerColor, this);
+        currentMoveSearch = new CopylessAlphaBeta(b, boardValue.copy(), moveValue, useMoveHeuristic, depth, playerColor, this);
         Thread searchThread = new Thread(currentMoveSearch);
         System.out.println("SearchAtDepth: Starting New Thread");
         searchThread.start();

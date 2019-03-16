@@ -37,6 +37,13 @@ public class ClosestToSquareHeuristic implements IBoardValue{
         frontier = new ArrayDeque<Location>(100);
     }
 
+    private ClosestToSquareHeuristic(int numRow, int numCol){
+        whiteDistances = new int[numRow][numCol];
+        blackDistances = new int[numRow][numCol];
+        searched = new boolean[numRow][numCol];
+        frontier = new ArrayDeque<Location>(100);
+    }
+
     @Override
     public int getBoardValueAsInt(Board b, int playerTurn) {
         return (int) java.lang.Math.round(getBoardValueAsDouble(b, playerTurn));
@@ -91,6 +98,11 @@ public class ClosestToSquareHeuristic implements IBoardValue{
             return ((double)whiteScore/blackScore);
         }
 
+    }
+
+    @Override
+    public ClosestToSquareHeuristic copy() {
+        return new ClosestToSquareHeuristic(whiteDistances.length, whiteDistances[0].length);
     }
 
     private void populateWithScores( Board b, int[][] pieceLocations, int[][] distances){

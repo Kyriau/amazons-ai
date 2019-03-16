@@ -16,7 +16,7 @@ import java.util.Arrays;
  */
 public class CopylessAlphaBeta implements Runnable{
 
-    private int globalMoveCount = 0;
+    //private int globalMoveCount = 0;
 
     private final Board originalBoard;
 
@@ -30,6 +30,7 @@ public class CopylessAlphaBeta implements Runnable{
 
     //Stuff for the agent to move
     private boolean interrupted;
+    private boolean runExited;
     private CopylessAlphaBetaPlayer invokingPlayer;
 
 
@@ -38,7 +39,7 @@ public class CopylessAlphaBeta implements Runnable{
      * @return a move that guarantees the best possible score given the search depth, if null, the game is over
      */
     public Move performSearch(){
-        if(interrupted){
+        if(runExited){
             throw new IllegalStateException("Once an AlphaBeta Search object has been interrupted, it cannot be used again");
         }
         //Initialize
@@ -57,10 +58,10 @@ public class CopylessAlphaBeta implements Runnable{
             moves = orderMovesByHeuristic(moves);
         }
         bestMove = moves.get(0);//Set equal to the first move
-        System.out.println("Moves =  " + moves.size() + ", depth = " + 0);
+        //System.out.println("Moves =  " + moves.size() + ", depth = " + 0);
         //Continue while there are more moves to play
         for (Move a: moves) {
-            System.out.println("Next toplevel move");
+            //System.out.println("Next toplevel move");
             result = alphaBetaLayer(a, 1, opponentTurn, alpha, beta);
             if(alpha < result){
                 alpha = result;
@@ -69,7 +70,7 @@ public class CopylessAlphaBeta implements Runnable{
             if(interrupted){
                 break;
             }
-            globalMoveCount+= 1;
+           // globalMoveCount+= 1;
         }
 
         return bestMove;
@@ -104,23 +105,27 @@ public class CopylessAlphaBeta implements Runnable{
         }
 
         //System.out.println("Moves =  " + moves.size() + ", depth = " + depth);
-        System.out.println(globalMoveCount);
+       // System.out.println(globalMoveCount);
         double result;
 
         int nextDepth = depth +1;
         int opponentTurn = BoardPieces.getColorCpposite(playerTurn);
 
         if(depth%2 == 0){//MAX LAYER
-            System.out.println("Depth even Layer");
+            //System.out.println("Depth even Layer");
             for (Move a: moves) {
                 if(interrupted){ //This code is intended to allow us to stop this with the thread
                     return alpha;
                 }
                 result = alphaBetaLayer(a, nextDepth, opponentTurn, alpha, beta);
+                if(result >= beta){//Pruning
+                    board.revertMove(m);
+                    return result;
+                }
                 if(alpha < result){
                     alpha = result;
                 }
-                globalMoveCount+= 1;
+               // globalMoveCount+= 1;
             }
             board.revertMove(m);
             return alpha;
@@ -131,13 +136,17 @@ public class CopylessAlphaBeta implements Runnable{
                     return beta;
                 }
                 result = alphaBetaLayer(a, nextDepth, opponentTurn, alpha, beta);
+                if(result <= alpha){//Pruning
+                    board.revertMove(m);
+                    return result;
+                }
                 if(beta > result){
                     beta = result;
                 }
                // System.out.println("i = " + i );
-                globalMoveCount+= 1;
+                //globalMoveCount+= 1;
             }
-            System.out.println("Exited odd layer");
+            //System.out.println("Exited odd layer");
             board.revertMove(m);
             return beta;
         }
@@ -170,6 +179,7 @@ public class CopylessAlphaBeta implements Runnable{
 
         //Purely for multithreaded control
         this.interrupted = false;
+        this.runExited= false;
         this.invokingPlayer = invokingPlayer;
     }
 
@@ -223,6 +233,7 @@ public class CopylessAlphaBeta implements Runnable{
         if(invokingPlayer!= null) {//Here for testing
             invokingPlayer.giveSearchResult(this, bestMoveAtDepth);
         }
+        this.runExited = true;
     }
 
     class MoveValuePair implements Comparable<MoveValuePair>{
