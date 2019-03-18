@@ -4,7 +4,7 @@ import game.datastructures.Board;
 import game.datastructures.BoardPieces;
 import game.datastructures.Move;
 
-public class MobilityOrderingHeuristic implements IMoveValueHeuristic {
+public class MobilityOrderingHeuristic implements IMoveValueHeuristic{
 
     private final boolean[][] visited;
 
@@ -38,6 +38,11 @@ public class MobilityOrderingHeuristic implements IMoveValueHeuristic {
         }else{
             return ((double)playerMobility)/opponentMobility;
         }
+    }
+
+    @Override
+    public IMoveValueHeuristic copyMoveHeuristic() {
+        return new MobilityOrderingHeuristic();
     }
 
     public double getBoardValue(Board b, int playerColor){

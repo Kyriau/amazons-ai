@@ -196,8 +196,8 @@ public class Board {
 
     /**
      *
-     * @param b The board to copy
-     * @return A copy of the board
+     * @param b The board to copyMoveHeuristic
+     * @return A copyMoveHeuristic of the board
      */
     public static Board copyBoard(Board b){
         Board copy = new Board(b.numRows, b.numCols);

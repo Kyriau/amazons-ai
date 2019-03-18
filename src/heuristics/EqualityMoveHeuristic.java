@@ -12,4 +12,9 @@ public class EqualityMoveHeuristic implements IMoveValueHeuristic{
     public double getMoveValue(Board b, Move m) {
         return 0;
     }
+
+    @Override
+    public IMoveValueHeuristic copyMoveHeuristic() {
+        return new EqualityMoveHeuristic();
+    }
 }

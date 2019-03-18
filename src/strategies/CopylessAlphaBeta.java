@@ -133,7 +133,7 @@ public class CopylessAlphaBeta implements Runnable{
         }
 
         if(depth == maxDepth){
-            double value = boardValue.getBoardValueAsDouble(board, playerTurn);
+            double value = boardValue.getBoardValue(board, playerTurn);
             board.revertMove(m);
             //System.out.println("Depth limit hit");
             return value;
@@ -197,7 +197,7 @@ public class CopylessAlphaBeta implements Runnable{
         if(runExited){
             throw new IllegalStateException("Once an AlphaBeta Search object has been interrupted, it cannot be used again");
         }
-        //Initialize : Makes a board copy
+        //Initialize : Makes a board copyMoveHeuristic
         refreshDataStructures();
         ArrayList<Move> moves = board.getAllMoves(currentPlayersTurnColor);
         if(moves.isEmpty()){
@@ -216,7 +216,7 @@ public class CopylessAlphaBeta implements Runnable{
         //Continue while there are more moves to play
         for (Move m: moves) {
             //System.out.println("Next toplevel move");
-            globalMoveCount +=1;
+            //globalMoveCount +=1;
             board.playMove(m);
             result = minLayer(1, alpha, beta);
             board.revertMove(m);
@@ -241,7 +241,7 @@ public class CopylessAlphaBeta implements Runnable{
     protected double maxLayer(int depth, double alpha, double beta){
         //Terminal State Checking
         if(depth == maxDepth){
-            return boardValue.getBoardValueAsDouble(board, currentPlayersTurnColor);
+            return boardValue.getBoardValue(board, currentPlayersTurnColor);
         }
         ArrayList<Move> moves = board.getAllMoves(currentPlayersTurnColor);
         if(moves.isEmpty()){
@@ -275,7 +275,7 @@ public class CopylessAlphaBeta implements Runnable{
         //Terminal State Checking
         if(depth == maxDepth){
             //We still use the same utility regardless of who is calling it for this version since we always look from our players perspective
-            return boardValue.getBoardValueAsDouble(board, currentPlayersTurnColor);
+            return boardValue.getBoardValue(board, currentPlayersTurnColor);
         }
         ArrayList<Move> moves = board.getAllMoves(BoardPieces.getColorCpposite(currentPlayersTurnColor));
         if(moves.isEmpty()){

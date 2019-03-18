@@ -4,27 +4,28 @@ import game.datastructures.Board;
 import game.datastructures.BoardPieces;
 import game.datastructures.Move;
 import heuristics.*;
-import strategies.CopylessAlphaBeta;
+import strategies.SelectiveSearch;
 
 
 /**
  *
  */
-public class CopylessAlphaBetaPlayer extends Agent {
+public class SelectivePlayer extends Agent {
 
     private Move bestMove;
     private Board b;
     private int playerColor;
+    private double selectivityCoeff;
     IMoveValueHeuristic moveValue;
     IBoardValue boardValue;
     boolean useMoveHeuristic;
 
-    private CopylessAlphaBeta currentMoveSearch;
+    private SelectiveSearch currentMoveSearch;
     private int depth;
     private int turn;
 
 
-    public CopylessAlphaBetaPlayer(Board b, int playerColor, IMoveValueHeuristic moveValue, boolean useMoveHeuristic, IBoardValue boardValue){
+    public SelectivePlayer(Board b, int playerColor, IMoveValueHeuristic moveValue, IBoardValue boardValue, double selectivityCoeff){
         if(playerColor != BoardPieces.BLACK && playerColor != BoardPieces.WHITE){
             throw new IllegalArgumentException("No such player colour");
         }
@@ -40,6 +41,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
         this.useMoveHeuristic = useMoveHeuristic;
         this.boardValue = boardValue;
         this.depth = 1;
+        this.selectivityCoeff = selectivityCoeff;
         turn = 1;
 
     }
@@ -62,13 +64,13 @@ public class CopylessAlphaBetaPlayer extends Agent {
     public void updateBoard(Move move) {
         //Stop the current search
         //System.out.println("updateBoard: Enter");
+        turn += 1;
         System.out.println("Agent "+ this + " Color = " + playerColor);
         if(currentMoveSearch != null) {
             currentMoveSearch.interrupt();
         }
 
         b.playMove(move);
-        turn+=1;
         //playerColor = BoardPieces.getColorCpposite(playerColor);
         depth = 1;
     }
@@ -98,7 +100,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
      * @param threadSearcher The object reference for the searcher
      * @param bestMove The best move by threadSearcher
      */
-    public void giveSearchResult(CopylessAlphaBeta threadSearcher, Move bestMove){
+    public void giveSearchResult(SelectiveSearch threadSearcher, Move bestMove){
         //System.out.println("giveSearchResult: Enter");
         if(threadSearcher == currentMoveSearch){//Check it is the same object
             System.out.println("Completed Search at Depth: " + depth);
@@ -106,7 +108,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
             if(bestMove == null){
                 return;//No moves left in search. We lost
             }
-            if(depth < 30) {
+            if(depth < 100) {
                 searchNextDepth();
             }
         }
@@ -132,13 +134,18 @@ public class CopylessAlphaBetaPlayer extends Agent {
 
         //Begin new search at depth
         //It is necessairy to copyMoveHeuristic boardValue or else there are access conflicts between threads
-        if(playerColor == BoardPieces.BLACK)
-            if(turn < 40) {
-                currentMoveSearch = new CopylessAlphaBeta(b, boardValue.copy(), moveValue.copyMoveHeuristic(), useMoveHeuristic, depth, playerColor, this);
+        /*
+        if(turn*0.015 + 0.10  < 0.5) {
+            if(turn < 10) {
+                currentMoveSearch = new SelectiveSearch(b, boardValue.copy(), new MobilityOrderingHeuristic(), depth, playerColor, this, selectivityCoeff);
             }else{
-                currentMoveSearch = new CopylessAlphaBeta(b, new ClosestToSquareHeuristic(), moveValue.copyMoveHeuristic(), useMoveHeuristic, depth, playerColor, this);
-        }
+                currentMoveSearch = new SelectiveSearch(b, boardValue.copy(), moveValue.copyMoveHeuristic(), depth, playerColor, this, selectivityCoeff);
+            }
+        }else{
+            currentMoveSearch = new SelectiveSearch(b, boardValue.copy(), moveValue.copyMoveHeuristic(), depth, playerColor, this, 1);
+        }*/
 
+        currentMoveSearch = new SelectiveSearch(b, boardValue.copy(), moveValue.copyMoveHeuristic(), depth, playerColor, this, 1);
 
         Thread searchThread = new Thread(currentMoveSearch);
         //System.out.println("SearchAtDepth: Starting New Thread");
@@ -150,19 +157,19 @@ public class CopylessAlphaBetaPlayer extends Agent {
      * @param colorOfFirstToMove either "BLACK" or "WHITE"
      * @return a CopylessAlphaBetaPlayer with the starting Color
      */
-    public static CopylessAlphaBetaPlayer buildDefault(String colorOfFirstToMove){
+    public static SelectivePlayer buildDefault(String colorOfFirstToMove){
         if(colorOfFirstToMove.equalsIgnoreCase("WHITE")){
-            return new CopylessAlphaBetaPlayer(new Board(),
+            return new SelectivePlayer(new Board(),
                     BoardPieces.WHITE,
-                    new MobilityOrderingHeuristic(),//Mobility Heuristic
-                    true,
-                    new MobilityTerritory());
+                    new MobilityOrderingHeuristic(),
+                    new ClosestToSquareHeuristic(),
+                    0.1);
         }else if(colorOfFirstToMove.equalsIgnoreCase("BLACK")){
-            return new CopylessAlphaBetaPlayer(new Board(),
+            return new SelectivePlayer(new Board(),
                     BoardPieces.BLACK,
-                    new MobilityOrderingHeuristic(),//Mobility Heuristic
-                    true,
-                    new MobilityTerritory());
+                    new MobilityOrderingHeuristic(),
+                    new ClosestToSquareHeuristic(),
+                    0.1);
         }else{
             throw new IllegalArgumentException("No Such Color");
         }

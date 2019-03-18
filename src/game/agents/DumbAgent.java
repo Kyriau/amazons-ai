@@ -39,6 +39,11 @@ public class DumbAgent extends Agent {
 
     }
 
+    @Override
+    public int getAgentColor() {
+        return -1; // DOES NOT MEAN ANYTHING
+    }
+
 
     public void run() {
 

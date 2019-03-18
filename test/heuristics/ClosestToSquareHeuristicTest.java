@@ -14,16 +14,16 @@ public class ClosestToSquareHeuristicTest {
     public void testBoardValues(){
         Board b = new Board();
         IBoardValue bv = new ClosestToSquareHeuristic(b);
-        assertTrue(threshEquals(bv.getBoardValueAsDouble(b, BoardPieces.WHITE),bv.getBoardValueAsDouble(b, BoardPieces.BLACK)));
-       // System.out.println(bv.getBoardValueAsDouble(b, BoardPieces.WHITE));
+        assertTrue(threshEquals(bv.getBoardValue(b, BoardPieces.WHITE),bv.getBoardValue(b, BoardPieces.BLACK)));
+       // System.out.println(bv.getBoardValue(b, BoardPieces.WHITE));
 
         Move toCenter = new Move(0,3,4,3,8,3);
         b.playMove(toCenter);
-        assertTrue(threshEquals(bv.getBoardValueAsDouble(b, BoardPieces.WHITE), 1.5));
-        //System.out.println(bv.getBoardValueAsDouble(b, BoardPieces.WHITE));
+        assertTrue(threshEquals(bv.getBoardValue(b, BoardPieces.WHITE), 1.5));
+        //System.out.println(bv.getBoardValue(b, BoardPieces.WHITE));
 
-        assertTrue(threshEquals(bv.getBoardValueAsDouble(b, BoardPieces.BLACK), 2.0/3.0));
-       // System.out.println(bv.getBoardValueAsDouble(b, BoardPieces.BLACK));
+        assertTrue(threshEquals(bv.getBoardValue(b, BoardPieces.BLACK), 2.0/3.0));
+       // System.out.println(bv.getBoardValue(b, BoardPieces.BLACK));
        // System.out.println(b);
 
     }

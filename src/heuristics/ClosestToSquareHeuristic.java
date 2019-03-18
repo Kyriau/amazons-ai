@@ -2,12 +2,13 @@ package heuristics;
 
 import game.datastructures.Board;
 import game.datastructures.BoardPieces;
+import game.datastructures.Move;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Queue;
 
-public class ClosestToSquareHeuristic implements IBoardValue{
+public class ClosestToSquareHeuristic implements IBoardValue, IMoveValueHeuristic{
 
 
     private final int[][] whiteDistances;//Will be used to hold the number of moves in the shortest path to a square, zero indicates no path
@@ -25,6 +26,30 @@ public class ClosestToSquareHeuristic implements IBoardValue{
             new Location(1, -1),
             new Location(0, -1)
     };
+
+    @Override
+    public double getMoveValue(Board b, Move m) {
+        int playerColor = b.getPieceAt(m.startRow,m.startCol);
+        if(!BoardPieces.isPlayerColor(playerColor)){
+            throw new IllegalArgumentException("Move has no starting piece");
+        }
+        b.playMove(m);
+        double result = getBoardValue(b, playerColor);
+        b.revertMove(m);
+        return result;
+
+    }
+
+
+    /**
+     * 10x10 board
+     */
+    public ClosestToSquareHeuristic(){
+        whiteDistances = new int[10][10];
+        blackDistances = new int[10][10];
+        searched = new boolean[10][10];
+        frontier = new ArrayDeque<Location>(100);
+    }
 
     /**
      *
@@ -44,10 +69,6 @@ public class ClosestToSquareHeuristic implements IBoardValue{
         frontier = new ArrayDeque<Location>(100);
     }
 
-    @Override
-    public int getBoardValueAsInt(Board b, int playerTurn) {
-        return (int) java.lang.Math.round(getBoardValueAsDouble(b, playerTurn));
-    }
 
     /**
      *
@@ -56,7 +77,7 @@ public class ClosestToSquareHeuristic implements IBoardValue{
      * @return The ratio of white squares over black squares. If White loses the negative infinity if Black loses then positive infinity
      */
     @Override
-    public double getBoardValueAsDouble(Board b, int playerTurn) {
+    public double getBoardValue(Board b, int playerTurn) {
         if(!BoardPieces.isPlayerColor(playerTurn)){
             throw new IllegalArgumentException("No such player colour to indicate player's turn");
         }
@@ -117,7 +138,12 @@ public class ClosestToSquareHeuristic implements IBoardValue{
     }
 
     @Override
-    public ClosestToSquareHeuristic copy() {
+    public IBoardValue copy() {
+        return new ClosestToSquareHeuristic();
+    }
+
+    @Override
+    public ClosestToSquareHeuristic copyMoveHeuristic() {
         return new ClosestToSquareHeuristic(whiteDistances.length, whiteDistances[0].length);
     }
 

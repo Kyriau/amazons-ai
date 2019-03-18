@@ -12,4 +12,10 @@ public interface IMoveValueHeuristic {
      * @return A rating of how good the move is in the context of the board b. Larger positive values are better.
      */
     public double getMoveValue(Board b, Move m);
+
+    /**
+     *
+     * @return A copyMoveHeuristic of this evaluator
+     */
+    public IMoveValueHeuristic copyMoveHeuristic();
 }

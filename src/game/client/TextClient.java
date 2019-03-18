@@ -25,6 +25,7 @@ public class TextClient extends Client {
 
     private Agent agent;
     private Board b; //The current state of the game
+    private int currentTurn;
 
     private Thread delay;
     private GameTimer timer;
@@ -34,6 +35,8 @@ public class TextClient extends Client {
     public TextClient() {
 
         sc = new Scanner(System.in);
+        //Black Starts
+        currentTurn = BoardPieces.BLACK;
 
     }
 
@@ -183,7 +186,6 @@ public class TextClient extends Client {
     }
 
     public void handleGameMessage(String messageType, Map<String,Object> msgDetails) {
-
         if(messageType.equals(GameMessage.GAME_ACTION_START)) {
             // White is "supposed" to play first, but Gao has Black playing first, we assume white agent until startup
             String blackName = (String) msgDetails.get(ClientPlayer.PLAYER_BLACK_STRING);
@@ -220,6 +222,8 @@ public class TextClient extends Client {
             agent.updateBoard(move);
             window.playMove(move);
 
+            //Toggle turn
+            currentTurn = agent.getAgentColor();
             startTimer();
             agent.startSearch();
 
@@ -246,6 +250,7 @@ public class TextClient extends Client {
         );
         window.playMove(move);
         agent.updateBoard(move);
+        currentTurn = BoardPieces.getColorCpposite(agent.getAgentColor());
     }
 
 }
