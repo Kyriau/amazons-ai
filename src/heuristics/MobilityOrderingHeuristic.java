@@ -22,7 +22,7 @@ public class MobilityOrderingHeuristic implements IMoveValueHeuristic{
     public double getMoveValue(Board b, Move m) {
         int playerColor = b.getPieceAt(m.startRow,m.startCol);
         if(!BoardPieces.isPlayerColor(playerColor)){
-            throw new IllegalArgumentException("Move has no starting piece");
+            throw new IllegalArgumentException("Move has no starting piece: " + m);
         }
         b.playMove(m);
         int playerMobility = getMobilityOf(b, b.getPieceLocations(playerColor));

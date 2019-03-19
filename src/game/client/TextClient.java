@@ -18,6 +18,8 @@ import ygraphs.ai.smart_fox.games.GamePlayer;
 
 public class TextClient extends Client {
 
+    private static final boolean indexingFromOne = true;
+
     private Scanner sc;
 
     private GameClient gaoClient;
@@ -210,14 +212,26 @@ public class TextClient extends Client {
             ArrayList<Integer> to = (ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.Queen_POS_NEXT);
             ArrayList<Integer> arrow = (ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.ARROW_POS);
 
-            Move move = new Move(
-                    from.get(0),
-                    from.get(1),
-                    to.get(0),
-                    to.get(1),
-                    arrow.get(0),
-                    arrow.get(1)
-            );
+            Move move;
+            if(indexingFromOne) {
+                move = new Move(
+                        from.get(0)-1,
+                        from.get(1)-1,
+                        to.get(0)-1,
+                        to.get(1)-1,
+                        arrow.get(0)-1,
+                        arrow.get(1)-1
+                );
+            }else{
+                move = new Move(
+                        from.get(0),
+                        from.get(1),
+                        to.get(0),
+                        to.get(1),
+                        arrow.get(0),
+                        arrow.get(1)
+                );
+            }
 
             agent.updateBoard(move);
             window.playMove(move);
@@ -243,11 +257,20 @@ public class TextClient extends Client {
      */
     public void sendMove(Move move) {
         System.out.println("Sending Move: " + move.toString());
-        gaoClient.sendMoveMessage(
-                new int[] {move.startRow, move.startCol},
-                new int[] {move.endRow, move.endCol},
-                new int[] {move.arrowRow, move.arrowCol}
-        );
+        if(indexingFromOne){
+            gaoClient.sendMoveMessage(
+                    new int[] {move.startRow+1, move.startCol+1},
+                    new int[] {move.endRow+1, move.endCol+1},
+                    new int[] {move.arrowRow+1, move.arrowCol+1}
+                    );
+        }else{
+            gaoClient.sendMoveMessage(
+                    new int[] {move.startRow, move.startCol},
+                    new int[] {move.endRow, move.endCol},
+                    new int[] {move.arrowRow, move.arrowCol}
+                    );
+
+        }
         window.playMove(move);
         agent.updateBoard(move);
         currentTurn = BoardPieces.getColorCpposite(agent.getAgentColor());

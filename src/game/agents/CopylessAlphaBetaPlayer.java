@@ -132,11 +132,12 @@ public class CopylessAlphaBetaPlayer extends Agent {
 
         //Begin new search at depth
         //It is necessairy to copyMoveHeuristic boardValue or else there are access conflicts between threads
-        if(playerColor == BoardPieces.BLACK)
-            if(turn < 40) {
-                currentMoveSearch = new CopylessAlphaBeta(b, boardValue.copy(), moveValue.copyMoveHeuristic(), useMoveHeuristic, depth, playerColor, this);
-            }else{
-                currentMoveSearch = new CopylessAlphaBeta(b, new ClosestToSquareHeuristic(), moveValue.copyMoveHeuristic(), useMoveHeuristic, depth, playerColor, this);
+        if(turn <= 12) {//12 is optimal, black manages a close victory, found empirically
+            currentMoveSearch = new CopylessAlphaBeta(b, boardValue.copy(), moveValue.copyMoveHeuristic(), useMoveHeuristic, depth, playerColor, this);
+        }else if (turn < 87){//Ideally, this should be done when we ca tell the board has only isolated player cells. 
+            currentMoveSearch = new CopylessAlphaBeta(b, new ClosestToSquareHeuristic(), moveValue.copyMoveHeuristic(), useMoveHeuristic, depth, playerColor, this);
+        }else{
+            currentMoveSearch = new CopylessAlphaBeta(b, new DepthHeuristic(), moveValue.copyMoveHeuristic(), useMoveHeuristic, depth, playerColor, this);
         }
 
 

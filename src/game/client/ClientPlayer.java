@@ -34,6 +34,9 @@ public class ClientPlayer extends GamePlayer {
     public boolean handleGameMessage(String messageType, Map<String, Object> msgDetails) {
 
         System.out.println("Message received: " + messageType);
+        for(String s: msgDetails.keySet()){
+            System.out.println(s + ": " +msgDetails.get(s));
+        }
 
         // Pass data down to the client.
         client.handleGameMessage(messageType, msgDetails);
