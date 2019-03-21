@@ -144,8 +144,11 @@ public class SelectivePlayer extends Agent {
         }else{
             currentMoveSearch = new SelectiveSearch(b, boardValue.copy(), moveValue.copyMoveHeuristic(), depth, playerColor, this, 1);
         }*/
-
-        currentMoveSearch = new SelectiveSearch(b, boardValue.copy(), moveValue.copyMoveHeuristic(), depth, playerColor, this, 1);
+        if(turn <=12) {
+            currentMoveSearch = new SelectiveSearch(b, boardValue.copy(), moveValue.copyMoveHeuristic(), depth, playerColor, this, 1);
+        }else{
+            currentMoveSearch = new SelectiveSearch(b, new ClosestToSquareHeuristic(), moveValue.copyMoveHeuristic(), depth, playerColor, this, 1);
+        }
 
         Thread searchThread = new Thread(currentMoveSearch);
         //System.out.println("SearchAtDepth: Starting New Thread");
@@ -162,13 +165,13 @@ public class SelectivePlayer extends Agent {
             return new SelectivePlayer(new Board(),
                     BoardPieces.WHITE,
                     new MobilityOrderingHeuristic(),
-                    new ClosestToSquareHeuristic(),
+                    new MobilityTerritory(),
                     0.1);
         }else if(colorOfFirstToMove.equalsIgnoreCase("BLACK")){
             return new SelectivePlayer(new Board(),
                     BoardPieces.BLACK,
                     new MobilityOrderingHeuristic(),
-                    new ClosestToSquareHeuristic(),
+                    new MobilityTerritory(),
                     0.1);
         }else{
             throw new IllegalArgumentException("No Such Color");

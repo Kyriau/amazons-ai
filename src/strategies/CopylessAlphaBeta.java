@@ -10,12 +10,15 @@ import heuristics.IMoveValueHeuristic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * This class allows diving and coming back up at a low cost, meant for fast, efficient traversal.
  * Employs basic AlphaBeta
  */
 public class CopylessAlphaBeta implements Runnable{
+
+    private static final Random rand = new Random();
 
     private int globalMoveCount = 0;
 
@@ -210,6 +213,7 @@ public class CopylessAlphaBeta implements Runnable{
         double alpha = Double.NEGATIVE_INFINITY;
         double beta = Double.POSITIVE_INFINITY;
         double result;
+        //ArrayList<Move> bestMoves = new ArrayList<>();
 
         bestMove = moves.get(0);//Set equal to the first move
         //System.out.println("Moves =  " + moves.size() + ", depth = " + 0);
@@ -224,7 +228,11 @@ public class CopylessAlphaBeta implements Runnable{
             if(alpha < result){
                 alpha = result;
                 bestMove = m;
-            }
+                //bestMoves = new ArrayList<>();
+                //bestMoves.add(m);
+            }/*else if(result == alpha){
+                //bestMoves.add(m);
+            }*/
             if(result >= beta){
                 return m;
             }
@@ -235,6 +243,7 @@ public class CopylessAlphaBeta implements Runnable{
             // globalMoveCount+= 1;
         }
 
+        //return bestMoves.get(rand.nextInt(bestMoves.size()));
         return bestMove;
     }
 
