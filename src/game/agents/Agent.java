@@ -31,6 +31,8 @@ public abstract class Agent implements Runnable {
 
     public abstract void setAgentColor(int color);
 
+    public abstract int getAgentColor();
+
     /**
      * Get a string that lists all currently available Agents.
      * This method will need to be updated whenever we add new Agents.
@@ -46,6 +48,7 @@ public abstract class Agent implements Runnable {
         //sb.append("\t" + TextAgent.class.getSimpleName() + "\n"); // Unused for now since it doesn't work
         sb.append("\t" + CopylessAlphaBetaPlayer.class.getSimpleName() + "\n"); // Still needs work; see parseAgent()
         sb.append("\t" + DumbAgent.class.getSimpleName() + "\n");
+        sb.append("\t" + SelectivePlayer.class.getSimpleName() + "\n");
         sb.append("\t" + GUIAgent.class.getSimpleName() + "\n");
         sb.deleteCharAt(sb.length() - 1);
 
@@ -60,9 +63,10 @@ public abstract class Agent implements Runnable {
      */
     public static Agent parseAgent(String name) {
 
-        if(name.equalsIgnoreCase(DumbAgent.class.getSimpleName()))
+        if (name.equalsIgnoreCase(DumbAgent.class.getSimpleName())) {
             return new DumbAgent();
-        else if(name.equalsIgnoreCase(GUIAgent.class.getSimpleName()))
+        
+        if(name.equalsIgnoreCase(GUIAgent.class.getSimpleName()))
             return new GUIAgent();
 
         // Don't use, it doesn't work
@@ -72,6 +76,9 @@ public abstract class Agent implements Runnable {
         //TODO: Instantiate CopylessAlphaBetaPlayer correctly
         if(name.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
             return CopylessAlphaBetaPlayer.buildDefault("WHITE");//By gao's API, WHICH ALWAYS SELECTS BLACK to go first, which we can correct for at game start
+        
+        if (name.equalsIgnoreCase(SelectivePlayer.class.getSimpleName()))
+            return SelectivePlayer.buildDefault("WHITE");
 
         throw new IllegalArgumentException("Unknown Agent subclass.");
 

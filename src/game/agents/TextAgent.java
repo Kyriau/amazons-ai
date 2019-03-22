@@ -58,4 +58,9 @@ public class TextAgent extends Agent {
         //Do nothing, player knows what color they are
     }
 
+    @Override
+    public int getAgentColor() {
+        return -1;//MEANINGLESS
+    }
+
 }

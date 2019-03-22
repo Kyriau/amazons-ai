@@ -4,7 +4,7 @@ import game.datastructures.Board;
 import game.datastructures.BoardPieces;
 import game.datastructures.Move;
 
-public class MobilityOrderingHeuristic implements IMoveValueHeuristic {
+public class MobilityOrderingHeuristic implements IMoveValueHeuristic{
 
     private final boolean[][] visited;
 
@@ -22,7 +22,7 @@ public class MobilityOrderingHeuristic implements IMoveValueHeuristic {
     public double getMoveValue(Board b, Move m) {
         int playerColor = b.getPieceAt(m.startRow,m.startCol);
         if(!BoardPieces.isPlayerColor(playerColor)){
-            throw new IllegalArgumentException("Move has no starting piece");
+            throw new IllegalArgumentException("Move has no starting piece: " + m);
         }
         b.playMove(m);
         int playerMobility = getMobilityOf(b, b.getPieceLocations(playerColor));
@@ -38,6 +38,11 @@ public class MobilityOrderingHeuristic implements IMoveValueHeuristic {
         }else{
             return ((double)playerMobility)/opponentMobility;
         }
+    }
+
+    @Override
+    public IMoveValueHeuristic copyMoveHeuristic() {
+        return new MobilityOrderingHeuristic();
     }
 
     public double getBoardValue(Board b, int playerColor){

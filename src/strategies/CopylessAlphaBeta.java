@@ -10,12 +10,15 @@ import heuristics.IMoveValueHeuristic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * This class allows diving and coming back up at a low cost, meant for fast, efficient traversal.
  * Employs basic AlphaBeta
  */
 public class CopylessAlphaBeta implements Runnable{
+
+    private static final Random rand = new Random();
 
     private int globalMoveCount = 0;
 
@@ -133,7 +136,7 @@ public class CopylessAlphaBeta implements Runnable{
         }
 
         if(depth == maxDepth){
-            double value = boardValue.getBoardValueAsDouble(board, playerTurn);
+            double value = boardValue.getBoardValue(board, playerTurn);
             board.revertMove(m);
             //System.out.println("Depth limit hit");
             return value;
@@ -197,7 +200,7 @@ public class CopylessAlphaBeta implements Runnable{
         if(runExited){
             throw new IllegalStateException("Once an AlphaBeta Search object has been interrupted, it cannot be used again");
         }
-        //Initialize : Makes a board copy
+        //Initialize : Makes a board copyMoveHeuristic
         refreshDataStructures();
         ArrayList<Move> moves = board.getAllMoves(currentPlayersTurnColor);
         if(moves.isEmpty()){
@@ -210,13 +213,14 @@ public class CopylessAlphaBeta implements Runnable{
         double alpha = Double.NEGATIVE_INFINITY;
         double beta = Double.POSITIVE_INFINITY;
         double result;
+        //ArrayList<Move> bestMoves = new ArrayList<>();
 
         bestMove = moves.get(0);//Set equal to the first move
         //System.out.println("Moves =  " + moves.size() + ", depth = " + 0);
         //Continue while there are more moves to play
         for (Move m: moves) {
             //System.out.println("Next toplevel move");
-            globalMoveCount +=1;
+            //globalMoveCount +=1;
             board.playMove(m);
             result = minLayer(1, alpha, beta);
             board.revertMove(m);
@@ -224,7 +228,11 @@ public class CopylessAlphaBeta implements Runnable{
             if(alpha < result){
                 alpha = result;
                 bestMove = m;
-            }
+                //bestMoves = new ArrayList<>();
+                //bestMoves.add(m);
+            }/*else if(result == alpha){
+                //bestMoves.add(m);
+            }*/
             if(result >= beta){
                 return m;
             }
@@ -235,13 +243,14 @@ public class CopylessAlphaBeta implements Runnable{
             // globalMoveCount+= 1;
         }
 
+        //return bestMoves.get(rand.nextInt(bestMoves.size()));
         return bestMove;
     }
 
     protected double maxLayer(int depth, double alpha, double beta){
         //Terminal State Checking
         if(depth == maxDepth){
-            return boardValue.getBoardValueAsDouble(board, currentPlayersTurnColor);
+            return boardValue.getBoardValue(board, currentPlayersTurnColor);
         }
         ArrayList<Move> moves = board.getAllMoves(currentPlayersTurnColor);
         if(moves.isEmpty()){
@@ -275,7 +284,7 @@ public class CopylessAlphaBeta implements Runnable{
         //Terminal State Checking
         if(depth == maxDepth){
             //We still use the same utility regardless of who is calling it for this version since we always look from our players perspective
-            return boardValue.getBoardValueAsDouble(board, currentPlayersTurnColor);
+            return boardValue.getBoardValue(board, currentPlayersTurnColor);
         }
         ArrayList<Move> moves = board.getAllMoves(BoardPieces.getColorCpposite(currentPlayersTurnColor));
         if(moves.isEmpty()){

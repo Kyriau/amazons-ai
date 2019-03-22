@@ -6,6 +6,8 @@ import game.datastructures.Move;
 import heuristics.*;
 import strategies.CopylessAlphaBeta;
 
+import java.util.ArrayList;
+
 
 /**
  *
@@ -21,6 +23,8 @@ public class CopylessAlphaBetaPlayer extends Agent {
 
     private CopylessAlphaBeta currentMoveSearch;
     private int depth;
+    private int turn;
+    private ArrayList<Move> allMovesPlayed= new ArrayList<>(92);
 
 
     public CopylessAlphaBetaPlayer(Board b, int playerColor, IMoveValueHeuristic moveValue, boolean useMoveHeuristic, IBoardValue boardValue){
@@ -39,6 +43,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
         this.useMoveHeuristic = useMoveHeuristic;
         this.boardValue = boardValue;
         this.depth = 1;
+        turn = 1;
 
     }
 
@@ -66,6 +71,8 @@ public class CopylessAlphaBetaPlayer extends Agent {
         }
 
         b.playMove(move);
+        allMovesPlayed.add(move);
+        turn+=1;
         //playerColor = BoardPieces.getColorCpposite(playerColor);
         depth = 1;
     }
@@ -82,6 +89,11 @@ public class CopylessAlphaBetaPlayer extends Agent {
             throw new IllegalArgumentException("No such player colour");
         }
         this.playerColor = color;
+    }
+
+    @Override
+    public int getAgentColor(){
+        return playerColor;
     }
 
 
@@ -123,11 +135,26 @@ public class CopylessAlphaBetaPlayer extends Agent {
         }
 
         //Begin new search at depth
-        //It is necessairy to copy boardValue or else there are access conflicts between threads
-        currentMoveSearch = new CopylessAlphaBeta(b, boardValue.copy(), moveValue, useMoveHeuristic, depth, playerColor, this);
+        //It is necessairy to copyMoveHeuristic boardValue or else there are access conflicts between threads
+        if(turn <= 12) {//12 is optimal, black manages a close victory, found empirically
+            currentMoveSearch = new CopylessAlphaBeta(b, boardValue.copy(), moveValue.copyMoveHeuristic(), useMoveHeuristic, depth, playerColor, this);
+        }else{//Ideally, this should be done when we ca tell the board has only isolated player cells.
+            //Currently testing to see if ordering by closestToSquareHeuristic is optimal
+            currentMoveSearch = new CopylessAlphaBeta(b, new ClosestToSquareHeuristic(), moveValue.copyMoveHeuristic(), useMoveHeuristic, depth, playerColor, this);
+        }
+
+
         Thread searchThread = new Thread(currentMoveSearch);
         //System.out.println("SearchAtDepth: Starting New Thread");
         searchThread.start();
+    }
+
+    /**
+     *
+     * @return An array of the moves sequentially made up to this point
+     */
+    public Move[] moveHistory(){
+        return allMovesPlayed.toArray(new Move[allMovesPlayed.size()]);
     }
 
     /**
@@ -139,17 +166,18 @@ public class CopylessAlphaBetaPlayer extends Agent {
         if(colorOfFirstToMove.equalsIgnoreCase("WHITE")){
             return new CopylessAlphaBetaPlayer(new Board(),
                     BoardPieces.WHITE,
-                    new MobilityOrderingHeuristic(),
+                    new MobilityOrderingHeuristic(),//Mobility Heuristic
                     true,
-                    new ClosestToSquareHeuristic(new Board()));
+                    new MobilityTerritory());
         }else if(colorOfFirstToMove.equalsIgnoreCase("BLACK")){
             return new CopylessAlphaBetaPlayer(new Board(),
                     BoardPieces.BLACK,
-                    new MobilityOrderingHeuristic(),
+                    new MobilityOrderingHeuristic(),//Mobility Heuristic
                     true,
-                    new ClosestToSquareHeuristic(new Board()));
+                    new MobilityTerritory());
         }else{
             throw new IllegalArgumentException("No Such Color");
         }
     }
+
 }
