@@ -6,6 +6,8 @@ import game.datastructures.Move;
 import heuristics.*;
 import strategies.CopylessAlphaBeta;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -26,6 +28,8 @@ public class CopylessAlphaBetaPlayer extends Agent {
     private int turn;
     private ArrayList<Move> allMovesPlayed= new ArrayList<>(92);
 
+    private long startTime = 0;
+
 
     public CopylessAlphaBetaPlayer(Board b, int playerColor, IMoveValueHeuristic moveValue, boolean useMoveHeuristic, IBoardValue boardValue){
         if(playerColor != BoardPieces.BLACK && playerColor != BoardPieces.WHITE){
@@ -44,6 +48,8 @@ public class CopylessAlphaBetaPlayer extends Agent {
         this.boardValue = boardValue;
         this.depth = 1;
         turn = 1;
+
+        startTime = System.currentTimeMillis();
 
     }
 
@@ -69,6 +75,8 @@ public class CopylessAlphaBetaPlayer extends Agent {
         if(currentMoveSearch != null) {
             currentMoveSearch.interrupt();
         }
+
+        outputMoveText(move);
 
         b.playMove(move);
         allMovesPlayed.add(move);
@@ -178,6 +186,17 @@ public class CopylessAlphaBetaPlayer extends Agent {
         }else{
             throw new IllegalArgumentException("No Such Color");
         }
+    }
+
+    private void outputMoveText(Move move) {
+
+        try {
+            FileOutputStream out = new FileOutputStream("logs/moves" + startTime + ".txt", true);
+            out.write((move.toString() + '\n').getBytes());
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

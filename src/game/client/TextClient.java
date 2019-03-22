@@ -184,7 +184,7 @@ public class TextClient extends Client {
 
     private void numb() {
 
-        System.out.println("Join numbered room: ");
+        System.out.print("Join numbered room: ");
         String input = sc.nextLine();
         int index = Integer.parseInt(input);
 

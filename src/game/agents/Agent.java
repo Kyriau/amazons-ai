@@ -1,6 +1,6 @@
 package game.agents;
 
-import game.datastructures.BoardPieces;
+//import game.datastructures.BoardPieces;
 import game.datastructures.Move;
 
 /**
@@ -49,7 +49,7 @@ public abstract class Agent implements Runnable {
         sb.append("\t" + CopylessAlphaBetaPlayer.class.getSimpleName() + "\n"); // Still needs work; see parseAgent()
         sb.append("\t" + DumbAgent.class.getSimpleName() + "\n");
         sb.append("\t" + SelectivePlayer.class.getSimpleName() + "\n");
-        sb.append("\t" + GUIAgent.class.getSimpleName() + "\n");
+        //sb.append("\t" + GUIAgent.class.getSimpleName() + "\n");
         sb.deleteCharAt(sb.length() - 1);
 
         return sb.toString();
@@ -63,11 +63,11 @@ public abstract class Agent implements Runnable {
      */
     public static Agent parseAgent(String name) {
 
-        if (name.equalsIgnoreCase(DumbAgent.class.getSimpleName())) {
+        if (name.equalsIgnoreCase(DumbAgent.class.getSimpleName()))
             return new DumbAgent();
         
-        if(name.equalsIgnoreCase(GUIAgent.class.getSimpleName()))
-            return new GUIAgent();
+        //if(name.equalsIgnoreCase(GUIAgent.class.getSimpleName()))
+            //return new GUIAgent();
 
         // Don't use, it doesn't work
         //if(name.equalsIgnoreCase(TextAgent.class.getSimpleName()))
