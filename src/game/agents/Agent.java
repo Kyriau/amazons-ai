@@ -40,6 +40,7 @@ public abstract class Agent implements Runnable {
         //sb.append("\t" + TextAgent.class.getSimpleName() + "\n"); // Unused for now since it doesn't work
         //sb.append("\t" + CopylessAlphaBetaPlayer.class.getSimpleName() + "\n"); // Still needs work; see parseAgent()
         sb.append("\t" + DumbAgent.class.getSimpleName() + "\n");
+        sb.append("\t" + GUIAgent.class.getSimpleName() + "\n");
         sb.deleteCharAt(sb.length() - 1);
 
         return sb.toString();
@@ -55,6 +56,8 @@ public abstract class Agent implements Runnable {
 
         if(name.equalsIgnoreCase(DumbAgent.class.getSimpleName()))
             return new DumbAgent();
+        else if(name.equalsIgnoreCase(GUIAgent.class.getSimpleName()))
+            return new GUIAgent();
 
         // Don't use, it doesn't work
         //if(name.equalsIgnoreCase(TextAgent.class.getSimpleName()))
