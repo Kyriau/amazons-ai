@@ -17,12 +17,12 @@ public class GUIAgent extends Agent implements ActionListener {
     }
 
     @Override
-    public Move makeMove() {
+    public Move getBestMove() {
         return bestMove;
     }
 
     @Override
-    public void receiveMove(Move move) {
+    public void updateBoard(Move move) {
 
     }
 
@@ -50,4 +50,18 @@ public class GUIAgent extends Agent implements ActionListener {
 
     }
 
+    @Override
+    public void startSearch() {
+
+    }
+
+    @Override
+    public void setAgentColor(int color) {
+
+    }
+
+    @Override
+    public int getAgentColor() {
+        return 0;
+    }
 }

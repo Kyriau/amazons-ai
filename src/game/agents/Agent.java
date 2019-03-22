@@ -65,6 +65,7 @@ public abstract class Agent implements Runnable {
 
         if (name.equalsIgnoreCase(DumbAgent.class.getSimpleName())) {
             return new DumbAgent();
+        }
         
         if(name.equalsIgnoreCase(GUIAgent.class.getSimpleName()))
             return new GUIAgent();
