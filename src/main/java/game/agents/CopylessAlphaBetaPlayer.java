@@ -44,7 +44,6 @@ public class CopylessAlphaBetaPlayer extends Agent {
         this.boardValue = boardValue;
         this.depth = 1;
         turn = 1;
-
     }
 
     /**
@@ -108,6 +107,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
             System.out.println("Completed Search at Depth: " + depth);
             this.bestMove = bestMove;
             if(bestMove == null){
+                super.setGameOver(true);
                 return;//No moves left in search. We lost
             }
             if(depth < 30) {

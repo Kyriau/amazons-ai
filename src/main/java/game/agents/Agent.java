@@ -10,6 +10,8 @@ import game.datastructures.Move;
  */
 public abstract class Agent implements Runnable {
 
+    private boolean gameOver = false;
+
     /**
      * Get the information for this Agent's next move.
      * This method will be called by the Client when time for making a move has elapsed.
@@ -32,6 +34,14 @@ public abstract class Agent implements Runnable {
     public abstract void setAgentColor(int color);
 
     public abstract int getAgentColor();
+
+    public void setGameOver(boolean gameState){
+        gameOver = gameState;
+    }
+
+    public boolean isGameOver(){
+        return gameOver;
+    }
 
     /**
      * Get a string that lists all currently available Agents.

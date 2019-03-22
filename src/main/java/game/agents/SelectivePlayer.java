@@ -63,9 +63,9 @@ public class SelectivePlayer extends Agent {
     @Override
     public void updateBoard(Move move) {
         //Stop the current search
+        System.out.println("Turn Completed:  " + turn +", Agent: "+ this + ", Color = " + playerColor);
         //System.out.println("updateBoard: Enter");
         turn += 1;
-        System.out.println("Agent "+ this + " Color = " + playerColor);
         if(currentMoveSearch != null) {
             currentMoveSearch.interrupt();
         }
