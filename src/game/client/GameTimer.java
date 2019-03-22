@@ -13,7 +13,7 @@ public class GameTimer implements Runnable {
     public GameTimer(Agent agent, Client client) {
         this.agent = agent;
         this.client = client;
-        time = 25000; // 25 seconds
+        time = 29500; // 29.5 seconds
     }
 
     public GameTimer(Agent agent, Client client, long time) {
