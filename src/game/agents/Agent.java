@@ -49,6 +49,7 @@ public abstract class Agent implements Runnable {
         sb.append("\t" + CopylessAlphaBetaPlayer.class.getSimpleName() + "\n"); // Still needs work; see parseAgent()
         sb.append("\t" + DumbAgent.class.getSimpleName() + "\n");
         sb.append("\t" + SelectivePlayer.class.getSimpleName() + "\n");
+        sb.append("\t" + GUIAgent.class.getSimpleName() + "\n");
         sb.deleteCharAt(sb.length() - 1);
 
         return sb.toString();
@@ -64,9 +65,19 @@ public abstract class Agent implements Runnable {
 
         if (name.equalsIgnoreCase(DumbAgent.class.getSimpleName())) {
             return new DumbAgent();
-        } else if (name.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName())){
+        
+        if(name.equalsIgnoreCase(GUIAgent.class.getSimpleName()))
+            return new GUIAgent();
+
+        // Don't use, it doesn't work
+        //if(name.equalsIgnoreCase(TextAgent.class.getSimpleName()))
+            //return new TextAgent();
+
+        //TODO: Instantiate CopylessAlphaBetaPlayer correctly
+        if(name.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
             return CopylessAlphaBetaPlayer.buildDefault("WHITE");//By gao's API, WHICH ALWAYS SELECTS BLACK to go first, which we can correct for at game start
-        }else if (name.equalsIgnoreCase(SelectivePlayer.class.getSimpleName()))
+        
+        if (name.equalsIgnoreCase(SelectivePlayer.class.getSimpleName()))
             return SelectivePlayer.buildDefault("WHITE");
 
         throw new IllegalArgumentException("Unknown Agent subclass.");
