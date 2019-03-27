@@ -8,6 +8,7 @@
 *.iml
 out/**/*.class
 target/**/*.class
+classes/**
 
 # Saved game logs
 logs/*.txt
