@@ -75,7 +75,6 @@ public abstract class Agent implements Runnable {
 
         if (name.equalsIgnoreCase(DumbAgent.class.getSimpleName()))
             return new DumbAgent();
-        }
         
         //if(name.equalsIgnoreCase(GUIAgent.class.getSimpleName()))
             //return new GUIAgent();
@@ -84,7 +83,6 @@ public abstract class Agent implements Runnable {
         //if(name.equalsIgnoreCase(TextAgent.class.getSimpleName()))
             //return new TextAgent();
 
-        //TODO: Instantiate CopylessAlphaBetaPlayer correctly
         if(name.equalsIgnoreCase(CopylessAlphaBetaPlayer.class.getSimpleName()))
             return CopylessAlphaBetaPlayer.buildDefault("WHITE");//By gao's API, WHICH ALWAYS SELECTS BLACK to go first, which we can correct for at game start
         
