@@ -18,7 +18,7 @@ import ygraphs.ai.smart_fox.games.GamePlayer;
 
 public class TextClient extends Client {
 
-    private static final boolean indexingFromOne = false;
+    private static final int indexSpecifier = 1;//0 = index 0, 1 = index 1
 
     private Scanner sc;
 
@@ -213,7 +213,7 @@ public class TextClient extends Client {
             ArrayList<Integer> arrow = (ArrayList<Integer>) msgDetails.get(AmazonsGameMessage.ARROW_POS);
 
             Move move;
-            if(indexingFromOne) {
+            if(indexSpecifier == 1) {
                 move = new Move(
                         from.get(0)-1,
                         from.get(1)-1,
@@ -257,7 +257,7 @@ public class TextClient extends Client {
      */
     public void sendMove(Move move) {
         System.out.println("Sending Move: " + move.toString());
-        if(indexingFromOne){
+        if(indexSpecifier == 1){
             gaoClient.sendMoveMessage(
                     new int[] {move.startRow+1, move.startCol+1},
                     new int[] {move.endRow+1, move.endCol+1},
