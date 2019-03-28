@@ -68,6 +68,8 @@ public class TextClient extends Client {
                 agent();
             } else if(input.startsWith("timer")) {
                 timer();
+            } else if(input.startsWith("numb")) {
+                numb();
             } else if(!input.startsWith("exit")) {
                 System.out.println("Unrecognized Command.");
             }
@@ -91,6 +93,7 @@ public class TextClient extends Client {
             sb.append("\tjoin\t- Join an Amazons room.\n");
             sb.append("\tagent\t- Set the agent used to play.\n");
             sb.append("\ttimer\t- Set the speed to play at.\n");
+            sb.append("\tnumb\t- Join room by number.\n");
         }
         sb.append("\texit\t- Exit program.\n");
 
@@ -176,6 +179,18 @@ public class TextClient extends Client {
 
         System.out.print("Set timer length in milliseconds: ");
         timer.setTime(sc.nextLong());
+
+    }
+
+    private void numb() {
+
+        System.out.print("Join numbered room: ");
+        String input = sc.nextLine();
+        int index = Integer.parseInt(input);
+
+        ArrayList<String> rooms = gaoClient.getRoomList();
+        String room = rooms.get(index);
+        gaoClient.joinRoom(room);
 
     }
 
