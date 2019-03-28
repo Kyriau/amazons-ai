@@ -6,9 +6,12 @@ import game.datastructures.Move;
 import heuristics.*;
 import strategies.CopylessAlphaBeta;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static java.lang.System.out;
 
 
 /**
@@ -69,7 +72,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
     public void updateBoard(Move move) {
         //Stop the current search
         //System.out.println("updateBoard: Enter");
-        System.out.println("Agent "+ this + " Color = " + playerColor);
+        out.println("Agent "+ this + " Color = " + playerColor);
         if(currentMoveSearch != null) {
             currentMoveSearch.interrupt();
         }
@@ -111,7 +114,7 @@ public class CopylessAlphaBetaPlayer extends Agent {
     public void giveSearchResult(CopylessAlphaBeta threadSearcher, Move bestMove){
         //System.out.println("giveSearchResult: Enter");
         if(threadSearcher == currentMoveSearch){//Check it is the same object
-            System.out.println("Completed Search at Depth: " + depth);
+            out.println("Completed Search at Depth: " + depth);
             this.bestMove = bestMove;
             if(bestMove == null){
                 super.setGameOver(true);
@@ -190,8 +193,23 @@ public class CopylessAlphaBetaPlayer extends Agent {
     private void outputMoveText(Move move) {
 
         try {
-            FileOutputStream out = new FileOutputStream("logs/moves" + startTime + ".txt", true);
+            File logDir = new File(System.getProperty("user.dir") + File.separator + "logs");
+            if(!logDir.isDirectory()){
+                logDir.mkdir();
+            }
+
+            File logFile = new File(logDir.getPath() + File.separator + "moves_" + startTime + ".txt");
+            FileOutputStream out;
+            if(!logFile.exists()){
+                logFile.createNewFile();
+                out = new FileOutputStream(logFile);
+            }else{
+                out = new FileOutputStream(logFile, true);
+            }
             out.write((move.toString() + '\n').getBytes());
+            out.flush();
+            out.close();
+            System.out.println("Appended move to : " + logFile);
         } catch(IOException e) {
             e.printStackTrace();
         }
