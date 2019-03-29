@@ -12,3 +12,4 @@ classes/**
 
 # Saved game logs
 logs/*.txt
+/CurrentAIVersionJars/**

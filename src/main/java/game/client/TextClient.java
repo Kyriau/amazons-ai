@@ -18,7 +18,7 @@ import ygraphs.ai.smart_fox.games.GamePlayer;
 
 public class TextClient extends Client {
 
-    private static final int indexSpecifier = 1;//0 = index 0, 1 = index 1
+    private static final int indexSpecifier = 0;//0 = index 0, 1 = index 1
 
     private Scanner sc;
 
